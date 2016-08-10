@@ -1,39 +1,61 @@
+<!--
+https://sketchfab.com/developers/viewer
+https://sketchfab.com/developers/viewer/screenshot
+-->
+
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Sketchfab Viewer API example</title>
-
-    <!-- Insert this script -->
     <script type="text/javascript" src="https://d2f25wgezub9nf.cloudfront.net/api/sketchfab-viewer-1.0.0.js"></script>
 </head>
-
 <body>
-    <!-- Insert an empty iframe -->
+  <% if can?(:curate, current_exhibit) and !current_page? [:edit, current_exhibit, document] %>
+    <button type="button" id="screenshot" class="pull-right btn btn-primary" >Screenshot</button>
+  <% end %>
     <iframe src="" id="api-frame" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
     <style>
-      iframe{width: 800px; height: 500px; border:0px; }
+      iframe{width: 70%; height: 60%; border:0px; }
     </style>
-    <!-- Initialize the viewer -->
     <script type="text/javascript">
-    var iframe = document.getElementById( 'api-frame' );
+    var iframe = $( '#api-frame' )[ 0 ];
     var version = '1.0.0';
     var urlid = '<%= document.sidecar(document._source[:id]).data["configured_fields"]["spotlight_upload_Sketchfab-uid_tesim"] %>';
-    console.log(urlid);
     var client = new Sketchfab( version, iframe );
 
+    var error = function () {
+      console.error( 'Error api Sketchfab !' );
+    };
+
+    var success = function ( api ) {
+      api.start( function () {
+    <% if can?(:curate, current_exhibit) and !current_page? [:edit, current_exhibit, document] %>
+        $( '#screenshot' ).click( function () {
+          $("#api-frame").css({"width": 250, "height": 250});
+          setTimeout(function(){
+            api.getScreenShot( 'image/png', function ( err, result ) {
+              //window.open( result, "_blank", "height = " + height + ", width = " + width );
+              //post encoded screenshot data to server. see save_screenshot in catalog_controller.rb
+              $.ajax({
+                data: 'result=' + result,
+                dataType: 'text',
+                type: 'post',
+                url: "/spotlight/<%=params[:exhibit_id]%>/save_screenshot/<%=params[:id]%>"
+              });
+              $("#api-frame").css({"width": '70%',"height": '60%'});
+            });
+          },500)
+        });
+    <% end %>
+      });
+    };
+
     client.init( urlid, {
-        success: function onSuccess( api ){
-            api.start();
-            api.addEventListener( 'viewerready', function() {
-                // API is ready to use
-                // Insert your code here
-                console.log( 'Viewer is ready' );
-            } );
-        },
-        error: function onError() {
-            console.log( 'Viewer error' );
-        }
+        success: success,
+        error: error,
+        preload: 1
     } );
+
     </script>
 </body>
 </html>

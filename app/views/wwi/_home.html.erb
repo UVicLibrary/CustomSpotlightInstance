@@ -1,15 +1,12 @@
 <%
 	@buckets = []
-	@buckets.push({:Title => "Explore", :Subtitle => "Browse the Collection", :Description => "Photographs, Letters, Scrapbooks, &c.", :Image => "/uploads/spotlight/resources/upload/url/2459/small_1999-033.1.7.2_Map1_1.jpg", :Link => "/spotlight/wwi/feature/discover"})
-	@buckets.push({:Title => "Stories", :Subtitle => "Personal Histories", :Description => "Read the stories of Canada's citizens.", :Image => "/uploads/spotlight/resources/upload/url/3749/small_2000-030_ScrpBk_017_a.jpg", :Link => "/spotlight/wwi/feature/stories"})
-	@buckets.push({:Title => "Learn", :Subtitle => "Students & Teachers", :Description => "Use this exhibit in the class room.", :Image => "/uploads/spotlight/wwi/learn_FrontPage.jpg", :Link => "/spotlight/wwi/feature/learn"})
+	@buckets.push({:Title => "Explore", :Subtitle => "Scrapbooks-Subtitle", :Description => "Scrapbooks yada yada", :Image => "/uploads/spotlight/resources/upload/url/700/jpeg_2005-036.5.2_ScrpBk_33-a.jpg", :Link => "/spotlight/wwi/feature/discover"})
+	@buckets.push({:Title => "Stories", :Subtitle => "Classroom-Subtitle", :Description => "Classroom yada yada", :Image => "/uploads/spotlight/resources/upload/url/1461/jpeg_JM02_056_1..jpg", :Link => "/spotlight/wwi/feature/stories"})
+	@buckets.push({:Title => "Learn", :Subtitle => "About-Subtitle", :Description => "About yada yada", :Image => "/uploads/spotlight/resources/upload/url/1413/jpeg_JM02_012_1..jpg", :Link => "/spotlight/wwi/feature/learn"})
 
 	
 	  
 %>
-<%= javascript_include_tag "unslider-min" %>
-<%= stylesheet_link_tag    "unslider", media: "all" %>
-
 <style>
 #search-image {
 	height: 100%;
@@ -20,16 +17,6 @@
 	/*padding: 140px 10px 140px 110px;*/
 	padding-top: 342px;
 	margin: 0 auto; 
-}
-.slider-image {
-	height: 100%;
-	width: 700px;
-	background-repeat: no-repeat;
-	background-size: 100%;
-	/*padding: 140px 10px 140px 110px;*/
-	padding-top: 342px;
-	margin: 0 auto; 
-	background-position: center;
 }
 #search-header {
 	height: 500px;
@@ -52,7 +39,7 @@
 	max-width: 100%; 
 	height: 155px;
 	background-size: 100%;
-	padding-top: 80px;
+	padding-top: 30px;
 }
 .front-card-title {
 	background-color: rgba(3,3,3,0.6);
@@ -61,40 +48,19 @@
 	color: white;
 	font-weight: bold;
 }
-.unslider-nav {
-	display: none;
-}
-/*<div id="search-image">
-			<%#= render_search_bar  %>
-			<a href="/spotlight/wwi/feature/welcome"><h1 class="front-card-title" style="margin-bottom:0;text-align: center;padding-top:8%">Enter Main Exhibit</h1></a>
-			<p class="front-card-title" style="font-weight: normal; margin-top:0; padding-top:0">&nbsp;</p>
-		</div>*/
 </style>
-<% 	slider_urls = ""
-	id_arr = [1346,3692,2453,3245]
-	id_arr.each do |id|
-		r = Spotlight::Resource.find(id)
-		slider_urls = slider_urls + "\"url(" +r.url.thumb.file.file.split("public").last + ")\","
-	end
-%>
 <%= render 'wwi/exhibit_navbar' if current_exhibit && !resource_masthead? %>
 <div class="custom-holder">
 	<div id="search-header">
-		<div class="my-slider">
-			<ul>
-				<% 	id_arr.each do |id|
-						r = Spotlight::Resource.find(id) %>
-					<%= ("<li class=\"slider-image\" style=\"background-image: url('"+r.url.thumb.file.file.split("public").last+"');\"></li>").html_safe %>
-				<% 	end %>
-			</ul>
+		<div id="search-image">
+			<%#= render_search_bar  %>
+			<a href=""><h1 class="front-card-title" style="margin-bottom:0;text-align: center;padding-top:8%">Enter Main Exhibit</h1></a>
+			<p class="front-card-title" style="font-weight: normal; margin-top:0; padding-top:0">&nbsp;</p>
 		</div>
-		<a href="/spotlight/wwi/feature/welcome" style="position:relative;top:-235px;"><h1 class="front-card-title" style="margin-bottom:0;text-align: center;padding-top:8%;">Enter Main Exhibit</h1></a>
-		<p class="front-card-title" style="font-weight: normal; margin-top:0; padding-top:0;position:relative;top:-235px;">&nbsp;</p>
 	</div>
 	<div id="buckets">
 	<%	@buckets.each do |bucket| %>
-		<%= link_to "", bucket[:Link], id: "bucket"+bucket[:Title] %>
-		<div onclick="document.getElementById('bucket<%=bucket[:Title]%>').click();" class="col-xs-12 exhibit-card" style="float:none; max-width:100%; height:155px; margin: 0 -16px 0 16px">
+		<div class="col-xs-12 exhibit-card" style="float:none; max-width:100%; height:155px; margin: 0 -16px 0 16px">
 		  <div class="flipper">
 			<div class="card-front card-face custom-card-front" style="background-image: url(<%=bucket[:Image]%>);">
 				<a href="<%=bucket[:Link]%>"><h2 class="front-card-title" style="text-align: center;"><%=bucket[:Title]%></h2></a>
@@ -155,21 +121,7 @@ window.onload = function() {
 	}
 	
 }
-</script>
-
-
-<script type="text/javascript">
-	jQuery(document).ready(function($) {
-			$('.my-slider').unslider({
-			autoplay: true,
-			arrows: true,
-			infinite: true
-			});
-			
-			$('.next')[0].innerHTML = '<span class="glyphicon glyphicon-chevron-right"></span>';
-			$('.prev')[0].innerHTML = '<span class="glyphicon glyphicon-chevron-left"></span>';
-		});
-/*var images = new Array(<%= slider_urls[0..-2].html_safe %>);
+var images = new Array("url(/uploads/spotlight/resources/upload/url/700/jpeg_2005-036.5.2_ScrpBk_33-a.jpg)","url(/uploads/spotlight/resources/upload/url/1461/jpeg_JM02_056_1..jpg)","url(/uploads/spotlight/resources/upload/url/1413/jpeg_JM02_012_1..jpg)");
 current = 0;
 
 function carousel() {
@@ -178,6 +130,6 @@ function carousel() {
     search_image.css('background-image', images[current]);
     setTimeout(carousel, 8000);
 }
-carousel();*/
+carousel();
 document.getElementsByName('utf8')[0].remove();
 </script>
