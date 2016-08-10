@@ -19,11 +19,9 @@ module Spotlight
 
         if @resource.save_and_index
           flash[:notice] = t('spotlight.resources.upload.success')
-		  
-		  if(params[:resources_upload][:url].content_type.include? "zip")
+          if(params[:resources_upload][:url].content_type.include? "zip")
             @resource.to_sketchfab
           end
-
           if params['add-and-continue']
             redirect_to new_exhibit_resource_path(@resource.exhibit, anchor: :new_resources_upload)
           else
@@ -41,7 +39,7 @@ module Spotlight
       def build_resource
 		  Rails.logger.info("\n AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"\n****************************\nIn upload_controller \n\nPARAMS: #{params.inspect}")
       if (params[:resources_upload][:url].content_type.include? "audio") ||
-		 (params[:resources_upload][:url].content_type.include? "video") ||
+				 (params[:resources_upload][:url].content_type.include? "video") ||
          (params[:resources_upload][:url].content_type.include? "zip")
 			  @resource ||= Spotlight::Resources::Videoupload.new exhibit: current_exhibit
 		  else

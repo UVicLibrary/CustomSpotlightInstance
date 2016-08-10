@@ -3,13 +3,13 @@ module Spotlight
   ##
   # Uploaded resource image attachments, downloaded locally for cropping and
   # representation. See {Spotlight::Resource::Upload}
-  class VideoItemUploader < CarrierWave::Uploader::Base
-    Rails.logger.warn("In VideoItemUploader 7 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
+  class SketchItemUploader < CarrierWave::Uploader::Base
+    Rails.logger.warn("In SketchItemUploader 7 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
     storage Spotlight::Engine.config.uploader_storage
 
 
     def extension_white_list
-	  Rails.logger.warn("In VideoItemUploader.extension_white_list 12 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
+	  Rails.logger.warn("In SketchItemUploader.extension_white_list 12 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
       Spotlight::Engine.config.allowed_upload_extensions
     end
 

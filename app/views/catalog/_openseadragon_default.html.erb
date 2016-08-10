@@ -1,40 +1,42 @@
-
+<script src="/assets/openseadragon.min.js"></script>
+<script src="/assets/bigscreen.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.js"></script>
 <%#= document._source[:jpeg_url_ssm].first %>
 <%#= document._source[:thumbnail_url_ssm].first %>
 <%#= document._source[:thumbnail_square_url_ssm].first %>
-<%  image = document.to_openseadragon(blacklight_config.view_config(:show)) 
-	sidecar = document.sidecar document._source[:id]
-	annotations = {}
-	aspectRatios = []
-	doc_id = document._source["id"]
-	o = [('a'..'z'), ('A'..'Z')].map { |i| i.to_a }.flatten
-	identifier = (0...10).map { o[rand(o.length)] }.join
-	doc_index = 0
-	@docs.each do |value|
-		width = value._source["spotlight_full_image_width_ssm"].first.to_f
+<%image = document.to_openseadragon(blacklight_config.view_config(:show))
+  sidecar = document.sidecar document._source[:id]
+  annotations = {}
+  aspectRatios = []
+  doc_id = document._source["id"]
+  o = [('a'..'z'), ('A'..'Z')].map { |i| i.to_a }.flatten
+  identifier = (0...10).map { o[rand(o.length)] }.join
+  doc_index = 0
+  @docs.each do |value|
+    width = value._source["spotlight_full_image_width_ssm"].first.to_f
         height = value._source["spotlight_full_image_height_ssm"].first.to_f
-		aspectRatios.push(height/width)
-		temp_sidecar = Spotlight::Resource.find(value._source[:id].split("-").last.to_i)
-		annotations[doc_index] = {}
-		count = temp_sidecar.data["spotlight_annotation_count_is"].to_i
-		for i in 0..count-1
-			annotations[doc_index][i] = {}
-			next if temp_sidecar.data["spotlight_annotation_public_isim"][i] == "0"
-			height = 0;
-			width = 0;
-			temp_sidecar.data.keys.each do |key|
-				if key.include? "annotation"
-					new_key = key
-					new_key = new_key.gsub(/spotlight_annotation_/, '').split('_').first
-					annotations[doc_index][i][new_key] = temp_sidecar.data[key][i]
-					
-				end
-			end
-		end
-		doc_index += 1
-	end
-	exhibit_id = params[:exhibit_id] || Spotlight::Exhibit.first.slug
-	%>
+    aspectRatios.push(height/width)
+    temp_sidecar = Spotlight::Resource.find(value._source[:id].split("-").last.to_i)
+    annotations[doc_index] = {}
+    count = temp_sidecar.data["spotlight_annotation_count_is"].to_i
+    for i in 0..count-1
+      annotations[doc_index][i] = {}
+      next if temp_sidecar.data["spotlight_annotation_public_isim"][i] == "0"
+      height = 0;
+      width = 0;
+      temp_sidecar.data.keys.each do |key|
+        if key.include? "annotation"
+          new_key = key
+          new_key = new_key.gsub(/spotlight_annotation_/, '').split('_').first
+          annotations[doc_index][i][new_key] = temp_sidecar.data[key][i]
+
+        end
+      end
+    end
+    doc_index += 1
+  end
+  exhibit_id = params[:exhibit_id] || Spotlight::Exhibit.first.slug
+  %>
 <% unless @docs.nil? %>
   <% count = Array(@docs).length %>
   <div class="openseadragon-holder <%= osd_container_class %>" style="width: 60%; height:700px;">
@@ -55,164 +57,166 @@
         </div>
     </div>
     <div id="openseadragon_<%= identifier.to_s %>" name="openseadragon_<%= identifier.to_s %>" class="openseadragon osd-image row" style="background-color: grey; height:650px;border: solid black 1px;">
-    <%= #openseadragon_picture_tag image, class: 'osd-image row', data: { openseadragon: osd_config } 
+    <%= #openseadragon_picture_tag image, class: 'osd-image row', data: { openseadragon: osd_config }
     %>
     </div>
     <script type="text/javascript">
-    	var annos = "";
-		function getAnnos() {
-			annos = $.parseJSON("<%= annotations.to_json.gsub("\\n","<br>").gsub("\\r","").html_safe.gsub("\\\"","'").gsub('"','\"').html_safe %>");
-		}		
-		getAnnos();
-		var aspectRatios = "";
-		function getAspectRatios() {
-			aspectRatios = $.parseJSON('<%= raw(aspectRatios.to_json) %>');
-		}		
-		getAspectRatios();
+      var annos = "";
+    function getAnnos() {
+      annos = $.parseJSON("<%= annotations.to_json.gsub("\\n","<br>").gsub("\\r","").html_safe.gsub("\\\"","'").gsub('"','\"').html_safe %>");
+    }
+    getAnnos();
+    var aspectRatios = "";
+    function getAspectRatios() {
+      aspectRatios = $.parseJSON('<%= raw(aspectRatios.to_json) %>');
+    }
+    getAspectRatios();
                 // ----------
                 function setupViewer() {
 
                     this.viewer_<%= identifier.to_s %> = OpenSeadragon({
                         id:                 "openseadragon_<%= identifier.to_s %>",
-						preserveViewport:   true,
-						visibilityRatio:    0.75,
-						minZoomLevel:       0.5,
-						zoomInButton:     "osd-zoom-in<%= identifier.to_s %>",
-						zoomOutButton:    "osd-zoom-out<%= identifier.to_s %>",
-						
-						fullPageButton:   "osd-full-page<%= identifier.to_s %>",
-						nextButton:       "osd-next<%= identifier.to_s %>",
-						previousButton:   "osd-previous<%= identifier.to_s %>",
-						<% if count > 1 %>
-						sequenceMode:       			true,
-						showReferenceStrip:             true,
-						referenceStripBackgroundColor:  'transparent',
-						<% end %>
+            preserveViewport:   true,
+            visibilityRatio:    0.75,
+            minZoomLevel:       0.5,
+            zoomInButton:     "osd-zoom-in<%= identifier.to_s %>",
+            zoomOutButton:    "osd-zoom-out<%= identifier.to_s %>",
+
+            fullPageButton:   "osd-full-page<%= identifier.to_s %>",
+            nextButton:       "osd-next<%= identifier.to_s %>",
+            previousButton:   "osd-previous<%= identifier.to_s %>",
+            <% if count > 1
+            %>
+            sequenceMode:             true,
+            showReferenceStrip:             true,
+            referenceStripPosition:         'TOP_RIGHT',
+            referenceStripBackgroundColor:  'transparent',
+            <% end
+            %>
                         tileSources:   [<% firstrun = true
                         @docs.each do |value|
-							%><%=firstrun ? "" : ","%>
-							<% 	key = value._source[:full_image_url_ssm].first.split('url/').last.split('.')
-								key = value._source[:full_image_url_ssm].first.split('url/').last.split(key.last).first.gsub('/', '~jpeg_').gsub('.', '*') %>
-							"http://<%=request.host%>/spotlight/<%=exhibit_id%>/iiif-service/<%=key%>/info.json"
-							<% firstrun = false
-						end %>
-						]
+              %><%=firstrun ? "" : ","%>
+              <%   key = value._source[:full_image_url_ssm].first.split('url/').last.split('.')
+                key = value._source[:full_image_url_ssm].first.split('url/').last.split(key.last).first.gsub('/', '~jpeg_').gsub('.', '*') %>
+              "http://<%=request.host%>/spotlight/<%=exhibit_id%>/iiif-service/<%=key%>/info.json"
+              <% firstrun = false
+            end %>
+            ]
                     });
                     this.viewer_<%= identifier.to_s %>.addHandler('page', function() {
-							//Tooltips
-							var current_page = viewer_<%= identifier.to_s %>.currentPage();
-							document.getElementById('osd-page<%= identifier.to_s %>').innerHTML = current_page+1;
-							setTimeout(bindtooltip, 500);
-							setTimeout(changePageInfo, 500);
-					});
-					<% if !params["page"].nil? %>
-						this.viewer_<%= identifier.to_s %>.goToPage(<%=params["page"]%>);
-					<% end %>
+              //Tooltips
+              var current_page = viewer_<%= identifier.to_s %>.currentPage();
+              document.getElementById('osd-page<%= identifier.to_s %>').innerHTML = current_page+1;
+              setTimeout(bindtooltip, 500);
+              setTimeout(changePageInfo, 500);
+          });
+          <% if !params["page"].nil? %>
+            this.viewer_<%= identifier.to_s %>.goToPage(<%=params["page"]%>);
+          <% end %>
                 }
 
             // ----------
             $(document).ready(function() {
                 setupViewer();
             });
-  
-    		jQuery(function() {
+
+        jQuery(function() {
                 //Tooltips
                 setTimeout(bindtooltip, 2000);
                 setTimeout(changePageInfo, 2000);
             });
-            
-            function bindtooltip() {
-            	var current_page = viewer_<%= identifier.to_s %>.currentPage();
-            	$.each(annos[current_page], function (index, value) {
-            		var id = "overlay-<%= identifier.to_s %>-"+index;
-					var elt = document.createElement("div");
-					elt.id = id;
-					elt.className = "highlight";
-					viewer_<%= identifier.to_s %>.addOverlay({
-						element: elt,
-						location: new OpenSeadragon.Rect(parseFloat(value["x"]), parseFloat(value["y"])*aspectRatios[current_page], parseFloat(value["width"]), parseFloat(value["height"])*aspectRatios[current_page])
-					}); 
-					
-					var tip = $(document.createElement("div"));
-					tip.attr("id", "annotation-<%= identifier.to_s %>-"+index);
-					tip.addClass("annotation");
-					var table = "<table>";
-					$.each(value, function (ind, val) {
-						if (ind == "x" || ind == "y" || ind == "width" || ind == "height" || ind == "public" || ind == "count")
-							return true;
-						if (ind == "date" || ind == "publisher-date")
-							if (val == "0001-01-01T00:00:00Z")
-								val = "";
-						table = table + "<tr><td class=\"right\">"+ind+":</td><td>"+val+"</td></tr>";
-					});
-					table = table + "</table>";
-					tip.html(table);
-					$('body').append(tip);
-					$("#"+id).hover(function(e){
-						$("#"+id).css("border","2px solid red");
-						var mousex = e.pageX + 30, //Get X coodrinates
-							mousey = e.pageY + 30, //Get Y coordinates
-							tipWidth = tip.width(), //Find width of tooltip
-							tipHeight = tip.height(), //Find height of tooltip
-						
-						//Distance of element from the right edge of viewport
-							tipVisX = $(window).width() - (mousex + tipWidth),
-						//Distance of element from the bottom of viewport
-							tipVisY = $(window).height() - (mousey + tipHeight);
-						  
-						if ( tipVisX < 20 ) { //If tooltip exceeds the X coordinate of viewport
-							mousex = e.pageX - tipWidth - 20;
-						} if ( tipVisY < 20 ) { //If tooltip exceeds the Y coordinate of viewport
-							mousey = e.pageY - tipHeight - 20;
-						} 
-						tip.css({  top: mousey, left: mousex, position: 'absolute' });
-						tip.show().css({"opacity": "0.95", "z-index": "10"}); //Show tooltip
 
-					}, function() {
-						tip.hide(); //Hide tooltip
-						jQuery("#"+id).css("border","");
-					});
-				});
-            };
-            
-            function changePageInfo() {
-            	var current_page = viewer_<%= identifier.to_s %>.currentPage();
-				document.getElementById('osd-page<%= identifier.to_s %>').innerHTML = current_page+1;
-            	var pages = $('.page');
-            	$.each(pages, function (index, value) {
-            		value.style.display = "none";
-            	});
-            	document.getElementById('page_'+current_page).style.display = "block";
+            function bindtooltip() {
+              var current_page = viewer_<%= identifier.to_s %>.currentPage();
+              $.each(annos[current_page], function (index, value) {
+                var id = "overlay-<%= identifier.to_s %>-"+index;
+          var elt = document.createElement("div");
+          elt.id = id;
+          elt.className = "highlight";
+          viewer_<%= identifier.to_s %>.addOverlay({
+            element: elt,
+            location: new OpenSeadragon.Rect(parseFloat(value["x"]), parseFloat(value["y"])*aspectRatios[current_page], parseFloat(value["width"]), parseFloat(value["height"])*aspectRatios[current_page])
+          });
+
+          var tip = $(document.createElement("div"));
+          tip.attr("id", "annotation-<%= identifier.to_s %>-"+index);
+          tip.addClass("annotation");
+          var table = "<table>";
+          $.each(value, function (ind, val) {
+            if (ind == "x" || ind == "y" || ind == "width" || ind == "height" || ind == "public" || ind == "count")
+              return true;
+            if (ind == "date" || ind == "publisher-date")
+              if (val == "0001-01-01T00:00:00Z")
+                val = "";
+            table = table + "<tr><td class=\"right\">"+ind+":</td><td>"+val+"</td></tr>";
+          });
+          table = table + "</table>";
+          tip.html(table);
+          $('body').append(tip);
+          $("#"+id).hover(function(e){
+            $("#"+id).css("border","2px solid red");
+            var mousex = e.pageX + 30, //Get X coodrinates
+              mousey = e.pageY + 30, //Get Y coordinates
+              tipWidth = tip.width(), //Find width of tooltip
+              tipHeight = tip.height(), //Find height of tooltip
+
+            //Distance of element from the right edge of viewport
+              tipVisX = $(window).width() - (mousex + tipWidth),
+            //Distance of element from the bottom of viewport
+              tipVisY = $(window).height() - (mousey + tipHeight);
+
+            if ( tipVisX < 20 ) { //If tooltip exceeds the X coordinate of viewport
+              mousex = e.pageX - tipWidth - 20;
+            } if ( tipVisY < 20 ) { //If tooltip exceeds the Y coordinate of viewport
+              mousey = e.pageY - tipHeight - 20;
             }
-            
-            
+            tip.css({  top: mousey, left: mousex, position: 'absolute' });
+            tip.show().css({"opacity": "0.95", "z-index": "10"}); //Show tooltip
+
+          }, function() {
+            tip.hide(); //Hide tooltip
+            jQuery("#"+id).css("border","");
+          });
+        });
+            };
+
+            function changePageInfo() {
+              var current_page = viewer_<%= identifier.to_s %>.currentPage();
+        document.getElementById('osd-page<%= identifier.to_s %>').innerHTML = current_page+1;
+              var pages = $('.page');
+              $.each(pages, function (index, value) {
+                value.style.display = "none";
+              });
+              document.getElementById('page_'+current_page).style.display = "block";
+            }
+
+
             var element = document.getElementById('openseadragon_<%= identifier.to_s %>');
 
-			document.getElementById('osd-full-page<%= identifier.to_s %>').addEventListener('click', function() {
-				if (BigScreen.enabled) {
-					BigScreen.request(element);
-					// You could also use .toggle(element, onEnter, onExit, onError)
-				}
-				else {
-					alert("didn't work");
-					// fallback for browsers that don't support full screen
-				}
-			}, false);
-            
-			function resize(size) {
-				var width = (size=="small" ? "60%" : "100%");
-				$('.openseadragon-holder').css("width", width);
-				$('#osd-small<%= identifier.to_s %>').css("display", (size=="small" ? "none" : "inline-block"));
-				$('#osd-full<%= identifier.to_s %>').css("display", (size=="full" ? "none" : "inline-block"));
-				$.each($('.page'), function(index,value) { 
-					value.style.marginLeft = (size=="small" ? "60%" : "0"); 
-				});
-			}
-			
+      document.getElementById('osd-full-page<%= identifier.to_s %>').addEventListener('click', function() {
+        if (BigScreen.enabled) {
+          BigScreen.request(element);
+          // You could also use .toggle(element, onEnter, onExit, onError)
+        }
+        else {
+          alert("didn't work");
+          // fallback for browsers that don't support full screen
+        }
+      }, false);
+
+      function resize(size) {
+        var width = (size=="small" ? "60%" : "100%");
+        $('.openseadragon-holder').css("width", width);
+        $('#osd-small<%= identifier.to_s %>').css("display", (size=="small" ? "none" : "inline-block"));
+        $('#osd-full<%= identifier.to_s %>').css("display", (size=="full" ? "none" : "inline-block"));
+        $.each($('.page'), function(index,value) {
+          value.style.marginLeft = (size=="small" ? "60%" : "0");
+        });
+      }
+
 </script>
-    
-    
+
+
   </div>
 
 <% end %>
-

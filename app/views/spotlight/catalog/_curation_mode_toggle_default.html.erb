@@ -4,4 +4,8 @@
 <% else %>
 	<%= exhibit_edit_link document, [:edit, current_exhibit, document], class: 'pull-right btn btn-primary' if can?(:curate, current_exhibit) and !current_page? [:edit, current_exhibit, document]  %>
 	<%= link_to "Annotate", {controller: "catalog", id: document._source["id"], action: "show_annotation"} , class: 'pull-right btn btn-primary' if can?(:curate, current_exhibit) and !current_page? [:edit, current_exhibit, document]  %>
+  <!-- <%if(document.sidecar(document.id).data["configured_fields"].key?("spotlight_upload_Sketchfab-uid_tesim"))%>
+    <button type="button" class="pull-right btn btn-primary" id="screenshot">Screenshot</button> %> -->
+    <!-- <%= link_to "Screenshot", {controller: "catalog", id: document._source["id"], action: "save_screenshot"}, class: 'pull-right btn btn-primary' if can?(:curate, current_exhibit) and !current_page? [:edit, current_exhibit, document] %> -->
+  <%end%>
 <% end %>

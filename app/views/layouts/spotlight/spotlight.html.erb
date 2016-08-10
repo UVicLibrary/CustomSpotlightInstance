@@ -11,23 +11,6 @@
     <!--[if IEMobile]>
       <meta http-equiv="cleartype" content="on">
     <![endif]-->
-    
-    <meta property="og:title" content="<%= h(@page_title).gsub(" - Blacklight", "") %>" />
-    <meta property="og:description" content="<%= h(@page_title).gsub(" - Blacklight", "") %>" />
-    <% if params[:exhibit_id] && params[:id] && (request.original_url.to_s.include? "catalog") %>
-    	<meta property="og:image" content="http://<%= request.host %>/uploads/spotlight/resources/upload/url/<%= params[:id].split('-').last %>/thumb_<%=Spotlight::Resource.find(params[:id].split('-').last)[:url].gsub("jpeg", "jpg")%>" />
-    <% end %>
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@UVicLib" />
-    <meta name="twitter:title" content="<%= h(@page_title).gsub(" - Blacklight", "") %>" />
-    <meta name="twitter:description" content="<%= h(@page_title).gsub(" - Blacklight", "") %>" />
-    <% if params[:exhibit_id] && params[:id] && (request.original_url.to_s.include? "catalog") %>
-    	<meta name="twitter:image" content="http://<%= request.host %>/uploads/spotlight/resources/upload/url/<%= params[:id].split('-').last %>/thumb_<%=Spotlight::Resource.find(params[:id].split('-').last)[:url]%>" />
-    	<meta name="twitter:image:alt" content="Picture" />
-    <% elsif params[:exhibit_id] && !Spotlight::Exhibit.find(params[:exhibit_id]).thumbnail.nil? %>
-    	<meta name="twitter:image" content="http://<%= request.host %><%=Spotlight::Exhibit.find(params[:exhibit_id]).thumbnail.image.url%>" />
-    	<meta name="twitter:image:alt" content="Picture" />
-    <% end %>
   <script type="text/javascript">
   var autocompleteExhibitCatalogIndexPath = "/spotlight/<%=params[:exhibit_id]%>/catalog/autocomplete.json?q=%25QUERY";
   </script>
@@ -39,21 +22,9 @@
 
   ga('create', 'UA-76440556-1', 'auto');
   ga('send', 'pageview');
-/**
-* Function that tracks a click on an outbound link in Analytics.
-* This function takes a valid URL string as an argument, and uses that URL string
-* as the event label. Setting the transport method to 'beacon' lets the hit be sent
-* using 'navigator.sendBeacon' in browser that support it.
-*/
-var trackOutboundLink = function(url) {
-   ga('send', 'event', 'outbound', 'click', url, {
-     'transport': 'beacon',
-     'hitCallback': function(){document.location = url;}
-   });
-}
+
 </script>
-    <title><%= h(@page_title).gsub(" - Blacklight", "") %></title>
-    
+    <title><%= h(@page_title || application_name) %></title>
     <link href="<%= current_exhibit ? spotlight.exhibit_opensearch_catalog_url(current_exhibit, format: 'xml') : main_app.opensearch_catalog_url(format: 'xml') %>" title="<%= application_name %>" type="application/opensearchdescription+xml" rel="search"/>
     <%= favicon_link_tag 'favicon.ico' %>
     <%= stylesheet_link_tag    "application" %>

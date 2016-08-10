@@ -37,7 +37,7 @@ module Blacklight::Catalog
 
     helper Blacklight::Facet
 
-    # When an action raises Blacklight::Exceptions::RecordNotFound, handle 
+    # When an action raises Blacklight::Exceptions::RecordNotFound, handle
     # the exception appropriately.
     rescue_from Blacklight::Exceptions::RecordNotFound, with: :invalid_document_id_error
 
@@ -72,8 +72,11 @@ module Blacklight::Catalog
     # get a single document from the index
     # to add responses for formats other than html or json see _Blacklight::Document::Export_
     def show
+      puts
+      puts "\n\n catalog.rb here 76\n\n"
       @response, @document = fetch params[:id]
       sidecar = @document.sidecar @document.id
+      puts "catalog.rb here 83"
       @docs = []
       @resps = []
       if (sidecar.data["configured_fields"].key? :items) && (sidecar.data["configured_fields"][:items].length > 0)
@@ -92,7 +95,7 @@ module Blacklight::Catalog
 	  	  @docs.push(@document)
 	  	  @resps.push(@response)
 	  end
-      
+
       respond_to do |format|
         format.html { setup_next_and_previous_documents }
         format.json { render json: { response: { document: @document } } }
@@ -158,7 +161,7 @@ module Blacklight::Catalog
 
     ##
     # Check if any search parameters have been set
-    # @return [Boolean] 
+    # @return [Boolean]
     def has_search_parameters?
       !params[:q].blank? or !params[:f].blank? or !params[:search_field].blank?
     end
@@ -233,14 +236,14 @@ module Blacklight::Catalog
     ##
     # Render the document export formats for a response
     # First, try to render an appropriate template (e.g. index.endnote.erb)
-    # If that fails, just concatenate the document export responses with a newline. 
+    # If that fails, just concatenate the document export responses with a newline.
     def render_document_export_format format_name
       render
     rescue ActionView::MissingTemplate
       render text: @response.documents.map { |x| x.export_as(format_name) if x.exports_as? format_name }.compact.join("\n"), layout: false
     end
 
-    # override this method to change the JSON response from #index 
+    # override this method to change the JSON response from #index
     def render_search_results_as_json
       {response: {docs: @document_list, facets: search_facets_as_json, pages: pagination_info(@response)}}
     end
@@ -252,10 +255,10 @@ module Blacklight::Catalog
         f["items"] = f["items"].as_json.each do |i|
           i['label'] ||= i['value']
         end
-      end 
+      end
     end
 
-    # override this method to change the JSON response from #facet 
+    # override this method to change the JSON response from #facet
     def render_facet_list_as_json
       {response: {facets: @pagination }}
     end
