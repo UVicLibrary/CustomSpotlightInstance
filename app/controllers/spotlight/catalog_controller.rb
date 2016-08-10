@@ -1,3 +1,4 @@
+require 'base64'
 module Spotlight
   ##
   # Spotlight's catalog controller. Note that this subclasses
@@ -9,13 +10,13 @@ module Spotlight
     load_and_authorize_resource :exhibit, class: Spotlight::Exhibit, prepend: true
     include Spotlight::Catalog
     include Spotlight::Concerns::CatalogSearchContext
-    	
+
     require "json"
     require "open-uri"
     ENV["TMPDIR"] = "/mnt/nfs/san_01/blacklight-tmp/imagemagick-tmp"
     ENV['TMP'] = "/mnt/nfs/san_01/blacklight-tmp/imagemagick-tmp"
     ENV['TEMP'] = "/mnt/nfs/san_01/blacklight-tmp/imagemagick-tmp"
-    
+
     before_action :authenticate_user!, only: [:admin, :edit, :make_public, :make_private, :create_annotation, :update_annotation, :show_annotation, :all_pdfs, :one_pdf]
     before_action :check_authorization, only: [:admin, :edit, :make_public, :make_private, :create_annotation, :update_annotation, :show_annotation, :all_pdfs, :one_pdf]
     before_action :redirect_to_exhibit_home_without_search_params!, only: :index
@@ -48,16 +49,16 @@ module Spotlight
       if @document.private? current_exhibit
         authenticate_user! && authorize!(:curate, current_exhibit)
       end
-	  
-	  if @document.sidecars.first.data["configured_fields"].key?("spotlight_upload_Sketchfab-uid_tesim") &&
-         @document.sidecars.first.data["configured_fields"]["spotlight_upload_Sketchfab-uid_tesim"].match(/\w{32}/) != nil
-        sketch_status
+      if @document.sidecars.first.data["configured_fields"].key?("spotlight_upload_Sketchfab-uid_tesim")
+        if @document.sidecars.first.data["configured_fields"]["spotlight_upload_Sketchfab-uid_tesim"].match(/\w{32}/) != nil
+           sketch_status
+        end
       end
-	  
       add_document_breadcrumbs(@document)
     end
-	
-	def sketch_status
+
+    #send a GET request to sketchfab to check the status of this model on skechfabs end
+    def sketch_status
       uri = URI.parse('https://api.sketchfab.com/v2/models/' + @document.sidecars.first.data["configured_fields"]["spotlight_upload_Sketchfab-uid_tesim"] + '/status?token=958b82879ec04945bba0cbcf7f4b691c')
       n = Net::HTTP.new(uri.host, uri.port)
       n.use_ssl = true
@@ -65,11 +66,11 @@ module Spotlight
       res = n.start do |http|
         http.request(req)
       end
-
       if    res.body.include? "PENDING"
         flash[:alert] = "The model is in the processing queue. Check back in a bit."
       elsif res.body.include? "PROCESSING"
         flash[:alert] = "The model is being processed by sketchfab. Check back in a bit."
+      #this one is kinda redundant.
       # elsif res.body.include? "SUCCEEDED"
       #     flash[:success] = "Uploaded to Sketchfab Successfully"
       elsif res.body.include? "FAILED"
@@ -77,6 +78,24 @@ module Spotlight
       end
     end
 
+
+    def save_screenshot
+      result = params[:result].gsub(' ', '+')
+      id = params[:id].split('-')[1]
+      decoded_no_header = Base64.decode64(result['data:image/png;base64,'.length .. -1])
+      File.open('public/uploads/spotlight/resources/videoupload/url/'+ id +'/'+ id + '.png', 'wb') { |f| f.write(decoded_no_header) }
+
+      solr = RSolr.connect :url => 'http://localhost:8983/solr/blacklight-core'
+      solr.update(
+        data: [{
+          id: params[:id],
+          thumbnail_url_ssm: { "set" => '/uploads/spotlight/resources/videoupload/url/'+id+'/'+id+'.png' }
+        }].to_json,
+        headers: { 'Content-Type' => 'application/json' }
+      )
+      solr.commit
+      flash[:success] = "Screenshot saved."
+    end
 
     # "id_ng" and "full_title_ng" should be defined in the Solr core's schema.xml.
     # It's expected that these fields will be set up to have  EdgeNGram filter
@@ -127,7 +146,7 @@ module Spotlight
       @response, @document = fetch params[:id]
       @docs = [@document]
     end
-    
+
     def show_annotation
       @response, @document = fetch params[:id]
       @width = @document._source["spotlight_full_image_width_ssm"].first.to_f
@@ -148,7 +167,7 @@ module Spotlight
 			end
 		end
     end
-    
+
     def create_annotation
     	begin
 			@response, @document = fetch params[:id]
@@ -160,18 +179,18 @@ module Spotlight
 				if f.include? "annotation"
 					p = params[f.gsub(/spotlight_annotation_/, '').split('_').first]
 					if (@sidecar.data["configured_fields"][f] == nil || @sidecar.data["configured_fields"][f].length == 0 )
-						@sidecar.data["configured_fields"][f] = [p] 
+						@sidecar.data["configured_fields"][f] = [p]
 					else
 						@sidecar.data["configured_fields"][f].push(p)
 					end
 					if (@resource.data[f] == nil || @resource.data[f].length == 0 )
-						@resource.data[f] = [p] 
+						@resource.data[f] = [p]
 					else
 						@resource.data[f].push(p)
 					end
 				end
 			end
-			
+
 			@sidecar.data["configured_fields"]["spotlight_annotation_count_is"] = count+1
 			@resource.data["spotlight_annotation_count_is"] = count+1
 			@sidecar.save
@@ -183,7 +202,7 @@ module Spotlight
 			redirect_to path.sub('create','show'), notice: "Annotation Failed to Submit Properly. Error: "
 		end
 	end
-	
+
 	def update_annotation
 		begin
 			@response, @document = fetch params[:id]
@@ -208,8 +227,8 @@ module Spotlight
 			redirect_to path.sub('update','show'), notice: "Annotation Failed to Submit Properly. Error: "
 		end
 	end
-	
-	def get_annotation 
+
+	def get_annotation
     	@response, @document = fetch params[:id]
     	annotations = []
     	@sidecar = Spotlight::SolrDocumentSidecar.where(document_id: @document["id"])
@@ -218,14 +237,11 @@ module Spotlight
 			@sidecar.data["configured_fields"].each_with_index do |f, key|
 				if key.include? "annotation"
 					annotations[0][key.gsub(/spotlight_annotation_/, '').split('_').first] = f
-					
-					
 				end
-				
 			end
 		end
 	end
-	
+
 	def iiif
 		ENV["TMPDIR"] = "/mnt/nfs/san_01/blacklight-tmp/imagemagick-tmp"
 		id = params[:id]
@@ -233,15 +249,15 @@ module Spotlight
 		id = id.gsub! '*','.'
 		image_url = "http://localhost:8983/digilib/Scaler/IIIF/#{params[:id]}/#{params[:region]}/#{params[:size]}/#{params[:rotation]}/#{params[:quality]}.#{params[:format]}"
 		render :text => open(image_url, "rb").read
-	end	
-    
+	end
+
 	def iiif_info
 		id = params[:id]
 		id = id.gsub! '~','!'
 		id = id.gsub! '*','.'
 		image_url = "http://localhost:8983/digilib/Scaler/IIIF/#{params[:id]}/#{params[:name]}.#{params[:format]}"
 		data = open(image_url, "rb").read
-		data = data.gsub "http://localhost:8983/digilib/Scaler/IIIF/", "http://#{request.host}/spotlight/#{params[:exhibit_id]}/iiif-service/" 
+		data = data.gsub "http://localhost:8983/digilib/Scaler/IIIF/", "http://#{request.host}/spotlight/#{params[:exhibit_id]}/iiif-service/"
 		data = data.gsub "!", "~"
 		id = data.dup
 		id = id.split('iiif-service/').last.split(',').first
@@ -253,14 +269,14 @@ module Spotlight
 		data = data.gsub "@protocol", "protocol"
 		data = data.gsub "}]", "}],\n\"tiles\": [{\n  \"scaleFactors\": [ 1, 2, 4, 8, 16 ],\n  \"width\": 256\n}]"
 		render :text => data
-	end	
-	
+	end
+
 	def all_pdfs
 		exhibit_id = Spotlight::Exhibit.find(params[:exhibit_id]).id
 		allr = Spotlight::Resource.where(exhibit_id: exhibit_id)
 		Spotlight::Resource.generate_pdfs(allr)
 	end
-	
+
 	def one_pdf
 		exhibit_id = Spotlight::Exhibit.find(params[:exhibit_id]).id
 		r = Spotlight::Resource.find(params[:id].split("-").last.to_i)
@@ -268,8 +284,8 @@ module Spotlight
 		Rails.logger.warn("PDF GENREERATE: #{value}")
 		redirect_to "/spotlight/#{exhibit_id}/catalog/#{params[:id]}", notice: "Currently creating PDF. This could take some time"
 	end
-	
-	
+
+
     def make_private
       @response, @document = fetch params[:catalog_id]
       @document.make_private!(current_exhibit)
