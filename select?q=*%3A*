@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<response>
-<lst name="responseHeader"><int name="status">0</int><int name="QTime">7</int><lst name="params"><str name="q">*:*</str></lst></lst><result name="response" numFound="0" start="0" maxScore="0.0"></result><lst name="facet_counts"><lst name="facet_queries"/><lst name="facet_fields"/><lst name="facet_dates"/><lst name="facet_ranges"/><lst name="facet_intervals"/></lst>
-</response>
