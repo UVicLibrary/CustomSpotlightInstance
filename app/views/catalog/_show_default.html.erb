@@ -1,0 +1,94 @@
+<%# default partial to display solr document fields in catalog show view -%>
+<style>
+.page {
+	padding: 30px;
+	margin-left: 60%;
+}
+dt {
+	margin-top: 10px;
+	font-weight: bold;
+}
+.dl-invert dt {
+	font-weight: bold;
+}
+</style>
+<br>
+ <% page_number = 0
+  @docs.each do |page| %>
+	  <div class="page" id="page_<%= page_number %>" style="display: none;">
+	    <% if @exhibit.users.include? current_or_guest_user %>
+	    	<%= exhibit_edit_link page, [:edit, current_exhibit, page], class: 'pull-right btn btn-primary' if can?(:curate, current_exhibit) and !current_page? [:edit, current_exhibit, page]  %>
+	    <% end %>
+	  	<dt onclick="hideShow('full_title_tesim', <%= page_number %>);" class="blacklight-full_title_tesim %>"><a><span id="full_title_tesim-page_<%= page_number %>" class="glyphicon glyphicon-chevron-down"></span>Page Title:</a></dt>
+		<dd class="blacklight-full_title_tesim"><%= page._source["full_title_tesim"].to_s.delete("[\"]") %></dd>
+		  <% document_show_fields(page).each do |field_name, field| -%>
+			<% if should_render_show_field? page, field %>
+				<dt onclick="hideShow('<%= field_name.parameterize %>', <%= page_number %>);" class="blacklight-<%= field_name.parameterize %>"><a><span id="<%= field_name.parameterize %>-page_<%= page_number %>" class="glyphicon glyphicon-chevron-down"></span><%= render_document_show_field_label page, field: field_name %></a></dt>
+				<dd class="blacklight-<%= field_name.parameterize %>"><%= render_document_show_field_value page, field: field_name %></dd>
+				<!-- show field_name <%= field_name %>-->
+			<% else %>
+			<!-- dont show field_name <%= field_name %> -->
+			<% end -%>
+		  <% end -%>
+		  <br>
+		  <br>
+		<font color="blue" style="font-weight:bold;">
+		<% if page._source.key? "jpeg_url_ssm" %>
+			<a href="<%=page._source["jpeg_url_ssm"].first%>">Download Page</a>
+		<% else %>
+			<a href="<%=page._source["full_image_url_ssm"].first%>">Download Page</a>
+		<% end %>
+		</font>
+	  </div>
+  <%page_number += 1 
+  	end %>
+<% if @docs.length > 1 %>
+  	<script type="text/javascript">
+		document.getElementById('page_0').style.display = "block";
+		document.getElementById('object-download').style.display = "none";
+	</script>
+<% end %>
+<div class="dl-invert" id="page_<%=page_number%>" style="clear:both; background-color: rgba(222,205,184,.4); padding:30px;">
+  <% document_show_fields(document).each do |field_name, field| -%>
+    <% if should_render_show_field? document, field %>
+	    <dt onclick="hideShow('<%= field_name.parameterize %>', <%= @docs.length %>);" class="blacklight-<%= field_name.parameterize %>"><a><span id="<%= field_name.parameterize %>-page_<%= page_number %>" class="glyphicon glyphicon-chevron-down"></span><%= render_document_show_field_label document, field: field_name %></a></dt>
+	    <dd class="blacklight-<%= field_name.parameterize %>"><%= render_document_show_field_value document, field: field_name %></dd>
+		<!-- show field_name <%= field_name %> -->
+	<% else %>
+	<!-- dont show field_name <%= field_name %> -->
+    <% end -%>
+  <% end -%>
+  <br>
+  <br>
+  <% if @docs.length > 1 %>
+  	<% r = Spotlight::Resource.find(document._source[:id].split("-").last) %>
+  	<% if File.exists? r.pdf_dir %>
+  		<div id="object-download" style="font-weight:bold;">
+			<a href="<%=r.pdf_dir.split("public").last%>">Download Complete Item</a>
+		</div>
+  	<% end %>
+  <% else %>
+    <div id="object-download" style="font-weight:bold;">
+	<% if document._source.key? "jpeg_url_ssm" %>
+		<a href="<%=document._source["jpeg_url_ssm"].first%>">Download Item</a>
+	<% else %>
+		<a href="<%=document._source["full_image_url_ssm"].first%>">Download Item</a>
+	<% end %>
+	</div>
+  <% end %>
+</div>
+<script type="text/javascript">
+	function hideShow(className, pageNumber) {
+		var field = $("#page_"+pageNumber.toString()+" dd.blacklight-"+className);
+		var span = $("#"+className+"-page_"+pageNumber.toString());
+		if (field.css("display") == "none") {
+			field.css("display", "block");
+			span.removeClass("glyphicon-chevron-right");
+			span.addClass("glyphicon-chevron-down");
+		} else {
+			field.css("display", "none");
+			span.removeClass("glyphicon-chevron-down");
+			span.addClass("glyphicon-chevron-right");
+		}
+	}
+</script>

@@ -1,0 +1,35 @@
+<style>
+	.blacklight-spotlight_annotation_x_dbsm,
+	.blacklight-spotlight_annotation_y_dbsm,
+	.blacklight-spotlight_annotation_width_dbsm,
+	.blacklight-spotlight_annotation_height_dbsm,
+	.blacklight-spotlight_annotation_title_tesim,
+	.blacklight-spotlight_annotation_author_tesim,
+	.blacklight-spotlight_annotation_description_tesim,
+	.blacklight-spotlight_annotation_date_dtsim,
+	.blacklight-spotlight_annotation_publisher_tesim,
+	.blacklight-spotlight_annotation_publisher-place_tesim,
+	.blacklight-spotlight_annotation_publisher-date_dtsim,
+	.blacklight-spotlight_annotation_people_tesim,
+	.blacklight-spotlight_annotation_locations_tesim,
+	.blacklight-spotlight_annotation_transcript_tesim,
+	.blacklight-spotlight_annotation_genre_tesim,
+	.blacklight-spotlight_annotation_public_isim 
+	
+	{ display: none; }
+</style>
+
+<script type="text/javascript">
+	function removeAnnoFields() {
+		var fields = $(document.getElementsByClassName('edit-fields')[0].children);
+		$.each(fields, function(index,field) {
+				if(field.className) {
+					if(field.className.indexOf('annotation') > -1) {
+						field.remove();
+					}
+				}
+		});
+	}
+	removeAnnoFields();
+
+</script>

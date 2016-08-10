@@ -1,0 +1,12 @@
+<div id="content" class="<%= show_content_classes %>" style="width: 100%;">
+  <%= render_document_main_content_partial %>
+  
+  <%= render :partial => "spotlight/shared/hidden_fields" %>
+  <% sc = Spotlight::SolrDocumentSidecar.where(document_id: params[:id]).first %>
+  <dt>Access and Use Rights: </dt><dd><%=sc.data["configured_fields"]["spotlight_upload_Rights_tesim"]%></dd>
+  
+</div>
+
+<div id="sidebar" class="<%= show_sidebar_classes %>">
+   <%#= render_document_sidebar_partial %>
+</div>

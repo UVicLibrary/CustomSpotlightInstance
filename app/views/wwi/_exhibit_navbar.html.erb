@@ -1,0 +1,27 @@
+<div id="exhibit-navbar" class="exhibit-navbar navbar navbar-default" role="navigation">
+  <div class="container" style="padding-left:10px; margin-right: 4%; min-width: 85%;">
+    <% if resource_masthead? %>
+      <%= link_to(current_exhibit.title, spotlight.exhibit_path(current_exhibit), class: 'navbar-brand') %>
+    <% end %>
+ <% if should_render_spotlight_search_bar? %>
+      <div class="navbar-right navbar-nav nav" style="float:right;">
+        <%= render_search_bar  %>
+      </div>
+    <% end %>
+    <ul class="nav navbar-nav" style="float:right;">
+      <li class="<%= "active" if current_page?(current_exhibit) %>"><%= link_to t(:'spotlight.curation.nav.home'), current_exhibit %></li>
+      <% current_exhibit.main_navigations.displayable.each do |navigation| %>
+        <%= render partial: "shared/#{navigation.nav_type}_navbar", locals: { navigation: navigation } %>
+      <% end %>
+    </ul>
+   <img src="/uploads/spotlight/logos/4/VimyVictoriabanner2.png" height="70" style="margin:5px;"/>
+   <%# if content_for? :masthead %>
+        <%#= content_for :masthead %>
+      <%# elsif current_exhibit %>
+        <%#= current_exhibit.title %>
+      <%# else %>
+        <%#= application_name %>
+      <%# end %>
+   
+  </div>
+</div>

@@ -1,0 +1,39 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Sketchfab Viewer API example</title>
+
+    <!-- Insert this script -->
+    <script type="text/javascript" src="https://d2f25wgezub9nf.cloudfront.net/api/sketchfab-viewer-1.0.0.js"></script>
+</head>
+
+<body>
+    <!-- Insert an empty iframe -->
+    <iframe src="" id="api-frame" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+    <style>
+      iframe{width: 800px; height: 500px; border:0px; }
+    </style>
+    <!-- Initialize the viewer -->
+    <script type="text/javascript">
+    var iframe = document.getElementById( 'api-frame' );
+    var version = '1.0.0';
+    var urlid = '<%= document.sidecar(document._source[:id]).data["configured_fields"]["spotlight_upload_Sketchfab-uid_tesim"] %>';
+    console.log(urlid);
+    var client = new Sketchfab( version, iframe );
+
+    client.init( urlid, {
+        success: function onSuccess( api ){
+            api.start();
+            api.addEventListener( 'viewerready', function() {
+                // API is ready to use
+                // Insert your code here
+                console.log( 'Viewer is ready' );
+            } );
+        },
+        error: function onError() {
+            console.log( 'Viewer error' );
+        }
+    } );
+    </script>
+</body>
+</html>

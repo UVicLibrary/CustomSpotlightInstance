@@ -1,0 +1,40 @@
+<% cache_unless current_user, [current_exhibit, @page] do %>
+<div id="sidebar" class="col-md-3" role="complementary">
+  <ol class="nav sidenav">
+   <% nxt = false
+	  prev = nil
+   	  @exhibit.feature_pages.published.at_top_level.each do |feature_section|
+   	  current = current_page? [spotlight, @exhibit, feature_section]
+      if nxt == true
+      	  @next_page = feature_section 
+      	  nxt = false
+      end
+      if current
+      	  @prev_page = prev 
+      	  nxt = true
+      end
+      prev = feature_section
+      %>
+      <li class="<%= 'active' if current %>">
+        <h4><%= link_to_unless_current feature_section.title, [spotlight, @exhibit, feature_section] %></h4>
+        <ol class="subsection">
+          <% feature_section.child_pages.published.each do |page|
+              current = current_page? [spotlight, @exhibit, page]
+			  if nxt == true
+				  @next_page = page 
+				  nxt = false
+			  end
+			  if current 
+				  @prev_page = prev 
+				  nxt = true
+			  end
+			  prev = page
+			  %>
+            <li class="<%= 'active' if current %>"><%= link_to_unless_current page.title, [spotlight, @exhibit, page] %></li>
+          <% end %>
+        </ol>
+      </li>
+    <% end %>
+  </ol>
+</div>
+<% end %>

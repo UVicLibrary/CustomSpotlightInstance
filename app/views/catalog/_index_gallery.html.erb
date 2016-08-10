@@ -1,0 +1,16 @@
+<div class="document col-xs-6 col-md-3">
+  <div class="thumbnail">
+  <% sidecar = Spotlight::SolrDocumentSidecar.where(document_id: document._source['id']).first %>
+  <% if (!sidecar.data["configured_fields"].nil?) && (sidecar.data["configured_fields"].key? "spotlight_upload_parent_tesim") && (sidecar.data["configured_fields"]["spotlight_upload_parent_tesim"].length > 0) %>
+    <%= (render_thumbnail_tag(document, {}, :counter => document_counter_with_offset(document_counter))).gsub("/spotlight/#{params['exhibit_id']}/catalog/#{document._source['id']}", sidecar.data["configured_fields"]["spotlight_upload_parent_tesim"].to_s).html_safe %>
+    <div class="caption">
+      <%= (render_document_partials document, blacklight_config.view_config(:gallery).partials, :document_counter => document_counter).gsub("/spotlight/#{params['exhibit_id']}/catalog/#{document._source['id']}", sidecar.data["configured_fields"]["spotlight_upload_parent_tesim"].to_s).html_safe %>
+    </div>
+  <% else %>
+    <%= render_thumbnail_tag(document, {}, :counter => document_counter_with_offset(document_counter)) %>
+    <div class="caption">
+      <%= render_document_partials document, blacklight_config.view_config(:gallery).partials, :document_counter => document_counter %>
+    </div>
+  <% end %>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<%# header bar for doc items in index view -%>
+<div class="documentHeader row">
+  <%# main title container for doc partial view
+      How many bootstrap columns need to be reserved
+      for bookmarks control depends on size.
+  -%>
+  <% document_actions = capture do %>
+    <% # bookmark functions for items/docs -%>
+    <%= render_index_doc_actions document, wrapping_class: "index-document-functions col-sm-3 col-lg-2" %>
+  <% end %>
+
+  <h5 class="index_title document-title-heading <%= document_actions.present? ? "col-sm-9 col-lg-10" : "col-md-12" %>">
+    <% if counter = document_counter_with_offset(document_counter) %>
+      <span class="document-counter">
+        <%= t('blacklight.search.documents.counter', counter: counter) %>
+      </span>
+    <% end %>
+    <% sidecar = Spotlight::SolrDocumentSidecar.where(document_id: document._source['id']).first %>
+  <% if (!sidecar.data["configured_fields"].nil?) && (sidecar.data["configured_fields"].key? "spotlight_upload_parent_tesim") && (sidecar.data["configured_fields"]["spotlight_upload_parent_tesim"].length > 0) %>
+    <%= (link_to_document document, document_show_link_field(document), counter: counter).gsub("/spotlight/#{params['exhibit_id']}/catalog/#{document._source['id']}", sidecar.data["configured_fields"]["spotlight_upload_parent_tesim"].to_s).html_safe %>
+  <% else %>
+    <%= link_to_document document, document_show_link_field(document), counter: counter %>
+  <% end %>
+  </h5>
+
+  <%= document_actions %>
+</div>

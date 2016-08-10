@@ -1,0 +1,32 @@
+<% set_html_page_title @page.title if @page.should_display_title? %>
+<% render 'tophat' %>
+<%= render 'sidebar' if @page.display_sidebar? %>
+
+<%= cache_unless current_user, @page do %>
+<div class="<%= @page.display_sidebar? ? 'col-md-9' : 'col-md-12' %>">
+  <div class="clearfix">
+    <%= render 'edit_page_link' if can? :edit, @page %>
+    <% if @page.should_display_title? %>
+      <h1 class="page-title">
+        <%= @page.title %>
+      </h1>
+    <% end %>
+  </div>
+  <div>
+    <% if @page.content? %>
+      <%= render @page.content %>
+    <% else %>
+      <%= render 'empty' %>
+    <% end %>
+  </div>
+  <br />
+  <% if @prev_page 
+    prev_link = "<span class=\"glyphicon glyphicon-chevron-left\"></span>".html_safe+@prev_page.title%>
+  	<h5 style="float: left;"><b><%= link_to_unless_current prev_link, [spotlight, @exhibit, @prev_page] %></b></h5>
+  <% end %>   
+  <% if @next_page 
+    next_link = (@next_page.title+"<span class=\"glyphicon glyphicon-chevron-right\"></span>").html_safe%>
+  	<h5 style="float: right;"><b><%= link_to_unless_current next_link, [spotlight, @exhibit, @next_page] %></b></h5>
+  <% end %>
+</div>
+<% end %>

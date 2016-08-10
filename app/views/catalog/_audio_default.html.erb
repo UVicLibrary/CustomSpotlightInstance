@@ -1,0 +1,44 @@
+<% count = @docs.length%>
+<div class="osd-toolbar row">
+  <%	if count > 1 %>
+	<div class="col-md-6 pagination">
+	  <a id="osd-previous" onclick="changePageInfo(this);"><span class="glyphicon glyphicon-chevron-left"></span></a>
+	  <span id="osd-page">1</span>  of <%= count %>
+	  <a id="osd-next" onclick="changePageInfo(this);"><span class="glyphicon glyphicon-chevron-right"></span></a>
+	</div>
+	<%	end %>
+</div>
+ <% page_number = 0
+ @docs.each do |doc| %>
+<audio class="audioplayer" id="audio_<%= page_number %>" style="display: none;" controls>
+  <source src="<%=  doc._source["full_image_url_ssm"][0] %>" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
+<% page_number += 1
+end %>
+<br>
+<script type="text/javascript">
+document.getElementById('audio_0').style.display = "block";
+function changePageInfo(el) {
+	current_page = parseInt(document.getElementById('osd-page').innerHTML);
+	if (el.id == "osd-previous")
+		current_page--;
+	else
+		current_page++;
+	if (current_page > <%= count %>)
+		current_page = 1;
+	if (current_page < 1)
+		current_page = <%= count %>;
+	document.getElementById('osd-page').innerHTML = current_page;
+	var pages = $('.page');
+	$.each(pages, function (index, value) {
+		value.style.display = "none";
+	});
+	document.getElementById('page_'+(current_page-1)).style.display = "block";
+	var audioplayers = $('.audioplayer');
+	$.each(audioplayers, function (index, value) {
+		value.style.display = "none";
+	});
+	document.getElementById('audio_'+(current_page-1)).style.display = "block";
+}
+</script>
