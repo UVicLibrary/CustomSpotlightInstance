@@ -1,8 +1,6 @@
 # encoding: utf-8
 require 'net/http/post/multipart'
 
-API_KEY = ""
-
 module Spotlight
   module Resources
     ##
@@ -15,12 +13,11 @@ module Spotlight
 	  Rails.logger.warn("In object videoupload.rb line 11 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
       # we want to do this before reindexing
       after_create :update_document_sidecar
-
+      
       def create(url,data,exhibit)
       	  Rails.logger.info("\n AT:"+Time.now.strftime("%m/%d %H:%M:%S:%L")+"\n****************************\nIn Video Upload Create \n\nCURRENT DATA: #{data.inspect}")
       	  super
       end
-
       def self.fields(exhibit)
         @fields ||= {}
         @fields[exhibit] ||= begin
@@ -33,25 +30,36 @@ module Spotlight
         self.class.fields(exhibit)
       end
 
-      #upload 3d model to sketchfab via https POST
-      #https://sketchfab.com/developers/data-api/v2
-      def to_sketchfab
+      def to_solr
+        store_url! # so that #url doesn't return the tmp directory
+
+        solr_hash = super
+Rails.logger.warn("In object videoupload.rb line 31 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
+        add_default_solr_fields solr_hash
+Rails.logger.warn("In object videoupload.rb line 33 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
+        #add_image_dimensions solr_hash
+Rails.logger.warn("In object videoupload.rb line 35 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
+        add_file_versions solr_hash
+Rails.logger.warn("In object videoupload.rb line 37 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
+        add_sidecar_fields solr_hash
+Rails.logger.warn("In object videoupload.rb line 39 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
+        solr_hash
+      end
+	  
+	  def to_sketchfab
         uri = URI.parse('https://api.sketchfab.com/v2/models')
         File.open(self.url.file.file) do |file|
-          #https://sketchfab.com/developers/data-api/v2#parameters
           req = Net::HTTP::Post::Multipart.new uri.path,
-            "token"       => API_KEY,
+            "token"       => "958b82879ec04945bba0cbcf7f4b691c",
             "modelFile"   => UploadIO.new(file, "application/zip", self.url.url),
-            "name"        => self.data['full_title_tesim'].to_s[0..44] + "...",
-            "description" => self.data['spotlight_upload_dc.description_tesim'],
-            "private"     => true
+            "name"        => self.data['full_title_tesim'].to_s[0..44] + '...',
+			"description" => self.data['spotlight_upload_dc.description_tesim'],
+            "private"     => false
           n = Net::HTTP.new(uri.host, uri.port)
           n.use_ssl = true
           res = n.start do |http|
             http.request(req)
           end
-
-          #the modles viewer uid is included in the https response form sketchfab. This next part saves the uid to sidecar and resource
           case res
             when Net::HTTPSuccess then
               self.data['spotlight_upload_Sketchfab-uid_tesim'] = res.body.match(/\w{32}/)[0]
@@ -62,38 +70,46 @@ module Spotlight
             when Net::HTTPRedirection then
               Rails.logger.warn "HTTPS redirected!"
             else
-							flash[:error] = res.body
+			  flash[:error] = "Sketchfab Error: " + res.body
               Rails.logger.warn res.body
           end
         end
       end
 
-      def to_solr
-        store_url! # so that #url doesn't return the tmp directory
-        solr_hash = super
-          Rails.logger.warn("In object videoupload.rb line 35 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
-        add_default_solr_fields solr_hash
-          Rails.logger.warn("In object videoupload.rb line 37 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
-        #add_image_dimensions solr_hash
-          Rails.logger.warn("In object videoupload.rb line 39 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
-        add_file_versions solr_hash
-          Rails.logger.warn("In object videoupload.rb line 41 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
-        add_sidecar_fields solr_hash
-          Rails.logger.warn("In object videoupload.rb line 43 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
-        solr_hash
+      def get_sketch
+        uri = URI.parse('https://api.sketchfab.com/v2/models/' + self.data['spotlight_upload_Sketchfab-uid_tesim'] + '/status?token=958b82879ec04945bba0cbcf7f4b691c')
+        n = Net::HTTP.new(uri.host, uri.port)
+        n.use_ssl = true
+        req = Net::HTTP::Get.new(uri.request_uri)
+        res = n.start do |http|
+          http.request(req)
+        end
+        res.body
       end
+
+      def get_sketch(uid)
+        uri = URI.parse('https://api.sketchfab.com/v2/models/' + uid + '/status?token=958b82879ec04945bba0cbcf7f4b691c')
+        n = Net::HTTP.new(uri.host, uri.port)
+        n.use_ssl = true
+        req = Net::HTTP::Get.new(uri.request_uri)
+        res = n.start do |http|
+          http.request(req)
+        end
+        res.body
+      end
+
 
       private
 
       def add_default_solr_fields(solr_hash)
         solr_hash[exhibit.blacklight_config.document_model.unique_key.to_sym] = compound_id
-		    solr_hash[Spotlight::Engine.config.full_image_field] = "#{url}"
-		      if "#{url}".end_with? "mp4"
-			      solr_hash["thumbnail_url_ssm"] = "/uploads/spotlight/resources/videoupload/url/stock.jpg"
-		      else
-			      solr_hash["thumbnail_url_ssm"] = "/uploads/spotlight/resources/videoupload/url/stockaudio.jpg"
-		      end
-	    end
+		solr_hash[Spotlight::Engine.config.full_image_field] = "#{url}"
+		if "#{url}".end_with? "mp4"
+			solr_hash["thumbnail_url_ssm"] = "/uploads/spotlight/resources/videoupload/url/stock.jpg"
+		else
+			solr_hash["thumbnail_url_ssm"] = "/uploads/spotlight/resources/videoupload/url/stockaudio.jpg"
+		end
+	  end
 
       def add_image_dimensions(solr_hash)
         dimensions = ::MiniMagick::Image.open(url.file.file)[:dimensions]

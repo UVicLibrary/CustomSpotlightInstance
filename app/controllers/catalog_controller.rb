@@ -40,6 +40,8 @@ class CatalogController < ApplicationController
     config.add_facet_field 'spotlight_upload_Language_ftesim', :label => 'Language', :limit => 10
     config.add_facet_field 'spotlight_upload_dc.Date-Created.Searchable_ftesim', :label => 'Date', :limit => 10
     config.add_facet_field 'spotlight_upload_dc.Type.Genre_ftesim', :label => 'Genre', :limit => 10
+    config.add_facet_field 'spotlight_upload_dc.Relation.IsPartOf.Collection_ftesim', :label => 'Collection', :limit => 10
     config.add_facet_field 'spotlight_upload_Format_tesim', :label => 'Format', :limit => 10
   end
 end
+

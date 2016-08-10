@@ -16,10 +16,10 @@ module Spotlight
       encoded_csv(csv_data).each do |row|
       	  #Rails.logger.info("\n AT:"+Time.now.strftime("%m/%d %H:%M:%S:%L")+"\n****************************\nIn uploads from cvs preform \n\nCURRENT ROW: #{row.inspect}")
         url = row.delete('url')
-
+        
         next unless url.present?
 
-        if (url.end_with? 'mp4')
+        if (url.include? ".mp4") || (url.include? ".mp3")
           Spotlight::Resources::Videoupload.create(
             remote_url_url: url,
             data: row,

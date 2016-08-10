@@ -10,7 +10,7 @@
       %>
         <div class="box" data-id="<%= document.id %>">
           <%= render_document_partials document, blacklight_config.view.embed.partials, (blacklight_config.view.embed.locals || {}).reverse_merge(block: solr_documents_embed_block) %>
-          <%= Spotlight::Resource.find(document.id.split('-').last).data["full_title_tesim"] %> 
+          <%= Spotlight::SolrDocumentSidecar.where(document_id: document.id).first.data["configured_fields"]["full_title_tesim"] %> 
         </div>
       <% end %>
     </div>

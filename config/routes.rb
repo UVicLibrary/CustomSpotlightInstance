@@ -4,8 +4,8 @@ Rails.application.routes.draw do
   mount Spotlight::Engine, at: 'spotlight'
 #  root to: "catalog#index" # replaced by spotlight root path
   blacklight_for :catalog
-  devise_for :users
-
+  devise_for :users  
+  
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
@@ -64,34 +64,32 @@ end
 
 
 #custom vvvvvvvvv
-
+  
 Spotlight::Engine.routes.draw do
-
+	  
     get ':exhibit_id/annotation/:id/show', to: 'catalog#show_annotation', as: 'show_annotation'
     post ':exhibit_id/annotation/:id/get', to: 'catalog#get_annotation'
     post ':exhibit_id/annotation/:id/create', to: 'catalog#create_annotation'
     post ':exhibit_id/annotation/:id/update', to: 'catalog#update_annotation'
     get ':exhibit_id/iiif-service/:id/:region/:size/:rotation/:quality', to: 'catalog#iiif', as: 'iiif'
     get ':exhibit_id/iiif-service/:id/:name', to: 'catalog#iiif_info', as: 'iiif_info'
-
+    
     get ':exhibit_id/compounds/new', to: 'compounds#new', as: 'compounds_new'
     post ':exhibit_id/compounds', to: 'compounds#create'
     get ':exhibit_id/compounds/:id/edit', to: 'compounds#edit', as: 'edit_compounds'
     put ':exhibit_id/compounds', to: 'compounds#update'
     patch ':exhibit_id/compounds', to: 'compounds#update'
-
+    
 	get ':exhibit_id/compound/new', to: 'compounds#new', as: 'compound_new'
     post ':exhibit_id/compound', to: 'compounds#create'
     get ':exhibit_id/compound/:id/edit', to: 'compounds#edit', as: 'edit_compound'
     put ':exhibit_id/compound', to: 'compounds#update'
     patch ':exhibit_id/compound', to: 'compounds#update'
-
+    
     get ':exhibit_id/catalog/:id/:page', to: 'catalog#show'
     #get ':exhibit_id/catalog/facet/:id', to: 'catalog#facet'
     get ':exhibit_id/generate_pdfs', to: 'catalog#all_pdfs'
     get ':exhibit_id/generate_pdfs/:id', to: 'catalog#one_pdf'
-
-    post ':exhibit_id/save_screenshot/:id', to: 'catalog#save_screenshot'
 end
 
   #custom ^^^^^^^^^^^^^

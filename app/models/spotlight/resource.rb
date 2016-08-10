@@ -39,7 +39,7 @@ module Spotlight
 	  Rails.logger.warn("In Resource.rb save AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
 	  super
 	  Rails.logger.warn("In Resource.rb save end AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
-	end
+	end 
     ##
     # Enqueue an asynchronous reindexing job for this resource
     def reindex_later
@@ -108,22 +108,23 @@ module Spotlight
         exhibit.blacklight_config.document_model if exhibit
       end
     end
-
+     
     def pdf_dir
     	pdfName = self.url.file.file.to_s.dup
       	pdfName.sub File.extname(pdfName), ".pdf"
     end
-
+    
 	def self.generate_pdfs(allr = nil)
 		allr ||= Spotlight::Resource.all
 		allr.each do |r|
 			next if r.class.to_s.include? "Video"
 			next if !r.data.key? "items"
 			next if r.data["items"].length < 2
+			next if r.data["items"].length > 100
 			pdfName = r.pdf_dir
 			next if File.exists? pdfName
 			pages = ""
-			r.data["items"].each do |pageId|
+			r.data["items"].each do |pageId| 
 				page = Spotlight::Resource.find(pageId.split("-").last)
 				pages += " " + (page.url.jpeg.file.file.to_s)
 			end
@@ -131,13 +132,14 @@ module Spotlight
 			Rails.logger.warn("convert #{pages} #{pdfName}: #{value}")
 		end
 	end
-
-	def self.index_all
-		Spotlight::Resource.all.each do |r|
-			r.save_and_index
-		end
+	
+	def self.reindex_group i=0
+		allr = Spotlight::Resource.all
+		top = ((i+499)>(allr.length-1) ? allr.length : i+499)
+		allr = allr[i..top]
+		Spotlight::ReindexJob.perform_later(allr.to_a)
 	end
-
+	
     concerning :Indexing do
       ##
       # Index the result of {#to_solr} into the index in batches of {#batch_size}
@@ -157,7 +159,7 @@ module Spotlight
           end
         end
       end
-
+      
       protected
 
       def reindex_with_logging

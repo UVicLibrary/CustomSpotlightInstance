@@ -9,7 +9,7 @@ module Spotlight
 
 
     def extension_white_list
-	  Rails.logger.warn("In VideoItemUploader.extension_white_list 12 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
+	  Rails.logger.warn("In ItemUploader.extension_white_list 14 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
       Spotlight::Engine.config.allowed_upload_extensions
     end
 

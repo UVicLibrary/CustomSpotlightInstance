@@ -1,12 +1,26 @@
-<% image = document.to_openseadragon(blacklight_config.view_config(:show)) %>
-
-<% unless image.nil? %>
-<div class="osd-image row">
-	<% image.each do |value| %>
-		<% key = value.first.first.to_tilesource[:levels].first[:url].split('url/').last.split('.')
-		key = value.first.first.to_tilesource[:levels].first[:url].split('url/').last.split(key.last).first.gsub('/', '~jpeg_').gsub('.', '*') %>
-		<%= link_to (image_tag "http://#{request.host}/spotlight/#{params[:exhibit_id]}/iiif-service/#{key}/full/400,/0/default.jpg"), "/spotlight/#{params[:exhibit_id]}/catalog/#{document._source[:id]}" %>
-    <% end %>
-  </div>
-
-<% end %>
+<% 	video_formats = [".mp4", ".avi"]		
+	audio_formats = [".mp3", ".ogg"]
+	sketch_formats = [".3ds", ".blend", ".shp", ".obj", ".zip"]
+	ext = File.extname(document._source["full_image_url_ssm"][0])
+%>
+<%	if video_formats.include? ext	%>	
+	  <%= render 'video_default', :document => document %>
+	<% elsif audio_formats.include? ext		%>	
+	  <%= render 'audio_default', :document => document %>
+	<% elsif sketch_formats.include? ext	%>	
+	  <%= render 'sketch_default', :document => document %>
+	<% elsif ".pdf".include? ext	%>	
+	  <%= render 'pdf_default', :document => document %>
+	<% else		
+		image = document.to_openseadragon(blacklight_config.view_config(:show)) %>
+		<% unless image.nil? %>
+		<div class="osd-image row">
+			<% image.each do |value| %>
+				<% key = value.first.first.to_tilesource[:levels].first[:url].split('url/').last.split('.')
+				key = value.first.first.to_tilesource[:levels].first[:url].split('url/').last.split(key.last).first.gsub('/', '~jpeg_').gsub('.', '*') %>
+				<%= link_to (image_tag "http://#{request.host}/spotlight/#{params[:exhibit_id]}/iiif-service/#{key}/full/400,/0/default.jpg"), "/spotlight/#{params[:exhibit_id]}/catalog/#{document._source[:id]}" %>
+			<% end %>
+		  </div>
+		
+		<% end %>
+	<% end %>

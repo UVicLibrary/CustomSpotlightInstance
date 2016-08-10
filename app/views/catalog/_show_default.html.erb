@@ -16,6 +16,9 @@ dt {
  <% page_number = 0
   @docs.each do |page| %>
 	  <div class="page" id="page_<%= page_number %>" style="display: none;">
+	    <% if @exhibit.users.include? current_or_guest_user %>
+	    	<%= exhibit_edit_link page, [:edit, current_exhibit, page], class: 'pull-right btn btn-primary' if can?(:curate, current_exhibit) and !current_page? [:edit, current_exhibit, page]  %>
+	    <% end %>
 	  	<dt onclick="hideShow('full_title_tesim', <%= page_number %>);" class="blacklight-full_title_tesim %>"><a><span id="full_title_tesim-page_<%= page_number %>" class="glyphicon glyphicon-chevron-down"></span>Page Title:</a></dt>
 		<dd class="blacklight-full_title_tesim"><%= page._source["full_title_tesim"].to_s.delete("[\"]") %></dd>
 		  <% document_show_fields(page).each do |field_name, field| -%>

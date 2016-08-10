@@ -1,13 +1,11 @@
-<%= link_to exhibit do %>
-<div class="col-xs-12 col-sm-4 exhibit-card">
+<%= link_to "", exhibit, id: "exhibit"+exhibit.id.to_s %>
+<div onclick="document.getElementById('exhibit<%=exhibit.id%>').click();" class="col-xs-12 col-sm-4 exhibit-card">
   <div class="<%=(request.env['HTTP_USER_AGENT'].downcase.include?("trident") ? "noflip" : "flipper") %>">
-    <div class="card-front card-face">
-      <%= render 'exhibit_card_front', exhibit: exhibit %>
-
-    </div>
-    <div class="card-back card-face">
-      <%= render 'exhibit_card_back', exhibit: exhibit %>
-    </div>
+	<div class="card-front card-face">
+	  <%= render 'exhibit_card_front', exhibit: exhibit %>
+	</div>
+	<div class="card-back card-face">
+	  <%= render 'exhibit_card_back', exhibit: exhibit %>
+	  </div>
   </div>
 </div>
-<% end %>

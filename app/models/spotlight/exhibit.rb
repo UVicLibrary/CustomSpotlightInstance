@@ -75,7 +75,7 @@ module Spotlight
     end
 
     def solr_data
-	  p "\n\n exhibit.rb here 78\n\n "
+	  p "\n\n exhibit.rb here 78\n\n"
       filters.each_with_object({}) do |filter, hash|
 	    p "\n\n exhibit.rb here 80\n\n"
         hash.merge! filter.to_hash

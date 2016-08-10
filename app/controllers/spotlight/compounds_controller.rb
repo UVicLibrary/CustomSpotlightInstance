@@ -114,17 +114,17 @@ module Spotlight
 				@resource.save_and_index
 				@sidecar.data["configured_fields"] = params[:data]
 				@sidecar.save
-				index = 0
-				@resource.data["items"].each do |value|
-					Rails.logger.warn("COMPOUND CONTROLLER EDIT!!!!!: "+value)
-					curr_resource = Spotlight::Resource.find(value.split("-").last.to_i)
-					curr_resource.data["spotlight_upload_parent_tesim"] = "/spotlight/#{params[:exhibit_id]}/catalog/#{@exhibit.id.to_s}-#{@resource.id.to_s}/#{index.to_s}"
-					curr_resource.save_and_index
-					curr_sidecar = Spotlight::SolrDocumentSidecar.where(document_id: value).first
-					curr_sidecar.data["configured_fields"]["spotlight_upload_parent_tesim"] = "/spotlight/#{params[:exhibit_id]}/catalog/#{@exhibit.id.to_s}-#{@resource.id.to_s}/#{index.to_s}"
-					curr_sidecar.save
-					index += 1
-				end
+				#index = 0
+				#@resource.data["items"].each do |value|
+				#	Rails.logger.warn("COMPOUND CONTROLLER EDIT!!!!!: "+value)
+				#	curr_resource = Spotlight::Resource.find(value.split("-").last.to_i)
+				#	curr_resource.data["spotlight_upload_parent_tesim"] = "/spotlight/#{params[:exhibit_id]}/catalog/#{@exhibit.id.to_s}-#{@resource.id.to_s}/#{index.to_s}"
+				#	curr_resource.save_and_index
+				#	curr_sidecar = Spotlight::SolrDocumentSidecar.where(document_id: value).first
+				#	curr_sidecar.data["configured_fields"]["spotlight_upload_parent_tesim"] = "/spotlight/#{params[:exhibit_id]}/catalog/#{@exhibit.id.to_s}-#{@resource.id.to_s}/#{index.to_s}"
+				#	curr_sidecar.save
+				#	index += 1
+				#end
 				redirect_to "/spotlight/#{params[:exhibit_id]}/dashboard", notice: 'compound object updated successfully'
 			rescue => e
 				Rails.logger.warn(e.inspect)
