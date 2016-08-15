@@ -2,14 +2,14 @@
 https://developers.google.com/maps/documentation/javascript/
 https://github.com/googlemaps/js-marker-clusterer
 -->
-
-<script src="https://maps.googleapis.com/maps/api/js?key="></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRV_7eh-tewCt7CLuA7hkIhdz5BM08byM"></script>
 <script src="/assets/markerclusterer.js"></script>
 <div id="map" style="height: 80%"></div>
 
 <script>
 //app\sir_trevor_blocks\google_map_block.rb#getsolr
 var items = <%=raw google_map_block.getsolr.to_json%>;
+console.log(items)
 window.onload = function() {
   var map           = new google.maps.Map(document.getElementById('map'), {});
   var bounds        = new google.maps.LatLngBounds();
@@ -34,7 +34,7 @@ window.onload = function() {
       '<h4>'+items[i].full_title_tesim[0]+'</h4>'+
       '<div style=" display: table;">'+
         '<div style="display: table-row">'+
-          '<div style="display: table-cell;"><img src="'+ items[i].thumbnail_url_ssm +'" alt ="/uploads/spotlight/resources/videoupload/url/stockaudio.jpg" height="60" width = "60"/></div>'+
+          '<div style="display: table-cell;"><img src="'+ items[i].thumbnail_url_ssm +'" alt ="/uploads/spotlight/resources/videoupload/url/stockaudio.jpg" height="100" width = "100"/></div>'+
           '<div style="display: table-cell; vertical-align: top; padding-left: 10px;">'+ (items[i]["spotlight_upload_dc.description_tesim"] == null? "" : items[i]["spotlight_upload_dc.description_tesim"]) +'</div>'+
         '</div>'+
         '<div style="display: table-row">'+
@@ -43,6 +43,7 @@ window.onload = function() {
         '</div>'+
       '</div>';
 
+      //groupsize is the number that is displayed on the red pin when there are markers on the exact same spot
     marker = new google.maps.Marker({
       map: null,
       position: position,

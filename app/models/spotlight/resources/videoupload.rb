@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'net/http/post/multipart'
 
-API_KEY = ""
+API_KEY = Rails.application.secrets[:sketchfab_api_key]
 
 module Spotlight
   module Resources
@@ -43,8 +43,8 @@ module Spotlight
             "token"       => API_KEY,
             "modelFile"   => UploadIO.new(file, "application/zip", self.url.url),
             "name"        => self.data['full_title_tesim'].to_s[0..44] + "...",
-            "description" => self.data['spotlight_upload_dc.description_tesim'],
-            "private"     => true
+            "description" => self.data['spotlight_upload_dc.description_tesim']
+            #"private"     => true
           n = Net::HTTP.new(uri.host, uri.port)
           n.use_ssl = true
           res = n.start do |http|

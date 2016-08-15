@@ -11,7 +11,7 @@ https://sketchfab.com/developers/viewer/screenshot
 </head>
 <body>
   <% if can?(:curate, current_exhibit) and !current_page? [:edit, current_exhibit, document] %>
-    <button type="button" id="screenshot" class="pull-right btn btn-primary" >Screenshot</button>
+    <button type="button" id="screenshot" class="pull-right btn btn-primary" >Set Thumbnail</button>
   <% end %>
     <iframe src="" id="api-frame" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
     <style>
@@ -46,6 +46,7 @@ https://sketchfab.com/developers/viewer/screenshot
             });
           },500)
         });
+
     <% end %>
       });
     };
