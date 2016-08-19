@@ -1,10 +1,9 @@
 # encoding: utf-8
 require 'net/http/post/multipart'
 
-API_KEY = Rails.application.secrets[:sketchfab_api_key]
-
 module Spotlight
   module Resources
+    API_KEY = Rails.application.secrets[:sketchfab_api_key]
     ##
     # Exhibit-specific resources, created using uploaded and custom fields
     class Videoupload < Spotlight::Resource

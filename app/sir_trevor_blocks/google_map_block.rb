@@ -5,8 +5,9 @@ class GoogleMapBlock < SirTrevorRails::Block
   def getsolr
     items = Array.new
     solr = RSolr.connect :url => 'http://localhost:8983/solr/blacklight-core'
+    query = self.search.nil? ? "*:*" : self.search.gsub(',',' OR ')
     res = solr.get 'select', :params => {
-      :q=>self.search.gsub(',',' OR '),
+      :q=>query,
       :start=>0,
       :rows=>1000,
       :fl=> ['id', 'exhibit_test-2_public_bsi', 'thumbnail_url_ssm', 'full_title_tesim', 'spotlight_upload_dc.Coverage-Spatial.Location_tesim', 'spotlight_upload_dc.Coverage-Spatial.Location_ftesim', 'spotlight_upload_dc.description_tesim'],

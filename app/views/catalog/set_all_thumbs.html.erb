@@ -1,0 +1,30 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+  <button type="button" id="allscreenshot" class="pull-right btn btn-primary" >Set All Thumbnails</button>
+  <iframe src="" id="frame" scrolling="no"></iframe>
+  <style>
+    iframe{width: 100%; height: 100%; border:0px; }
+  </style>
+  <script type="text/javascript">
+  var models = <%= raw get_all_models.to_json%>;
+  var i = 0
+  $( '#allscreenshot' ).click( function () {
+    var timer = setInterval(function(){
+      if(i >= models.length){
+        clearInterval(timer);
+      }else{
+        document.getElementById('frame').src = '/spotlight/'+models[i].id.split("-")[0]+'/catalog/'+models[i++].id +'#screenshot';
+        document.getElementById('frame').onload = function(){
+          setTimeout(function(){
+            $('#frame').contents().find('#screenshot').trigger( "click" );
+          },5000);
+        }
+      }
+    },10000)
+  });
+  </script>
+</body>
+</html>

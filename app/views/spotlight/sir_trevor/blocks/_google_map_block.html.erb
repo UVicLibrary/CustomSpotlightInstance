@@ -9,7 +9,6 @@ https://github.com/googlemaps/js-marker-clusterer
 <script>
 //app\sir_trevor_blocks\google_map_block.rb#getsolr
 var items = <%=raw google_map_block.getsolr.to_json%>;
-console.log(items)
 window.onload = function() {
   var map           = new google.maps.Map(document.getElementById('map'), {});
   var bounds        = new google.maps.LatLngBounds();
@@ -43,7 +42,7 @@ window.onload = function() {
         '</div>'+
       '</div>';
 
-      //groupsize is the number that is displayed on the red pin when there are markers on the exact same spot
+      //groupsize is the number that is displayed on the red pin when markers on the exact same spot
     marker = new google.maps.Marker({
       map: null,
       position: position,

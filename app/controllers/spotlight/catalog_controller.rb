@@ -16,6 +16,7 @@ module Spotlight
     ENV["TMPDIR"] = "/mnt/nfs/san_01/blacklight-tmp/imagemagick-tmp"
     ENV['TMP'] = "/mnt/nfs/san_01/blacklight-tmp/imagemagick-tmp"
     ENV['TEMP'] = "/mnt/nfs/san_01/blacklight-tmp/imagemagick-tmp"
+    API_KEY = Rails.application.secrets[:sketchfab_api_key]
 
     before_action :authenticate_user!, only: [:admin, :edit, :make_public, :make_private, :create_annotation, :update_annotation, :show_annotation, :all_pdfs, :one_pdf]
     before_action :check_authorization, only: [:admin, :edit, :make_public, :make_private, :create_annotation, :update_annotation, :show_annotation, :all_pdfs, :one_pdf]
@@ -59,7 +60,7 @@ module Spotlight
 
     #send a GET request to sketchfab to check the status of this model on skechfabs end
     def sketch_status
-      uri = URI.parse('https://api.sketchfab.com/v2/models/' + @document.sidecars.first.data["configured_fields"]["spotlight_upload_Sketchfab-uid_tesim"] + '/status?token=958b82879ec04945bba0cbcf7f4b691c')
+      uri = URI.parse('https://api.sketchfab.com/v2/models/' + @document.sidecars.first.data["configured_fields"]["spotlight_upload_Sketchfab-uid_tesim"] + '/status?token=' + API_KEY)
       n = Net::HTTP.new(uri.host, uri.port)
       n.use_ssl = true
       req = Net::HTTP::Get.new(uri.request_uri)
@@ -94,8 +95,13 @@ module Spotlight
         headers: { 'Content-Type' => 'application/json' }
       )
       solr.commit
-      flash[:success] = "Screenshot saved."
+      p "thumbnail set for " + params[:id]
     end
+
+    def set_all_thumbs
+      s = "hello!"
+    end
+
 
     # "id_ng" and "full_title_ng" should be defined in the Solr core's schema.xml.
     # It's expected that these fields will be set up to have  EdgeNGram filter

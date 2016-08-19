@@ -80,7 +80,7 @@ Spotlight::Engine.routes.draw do
     put ':exhibit_id/compounds', to: 'compounds#update'
     patch ':exhibit_id/compounds', to: 'compounds#update'
 
-	get ':exhibit_id/compound/new', to: 'compounds#new', as: 'compound_new'
+    get ':exhibit_id/compound/new', to: 'compounds#new', as: 'compound_new'
     post ':exhibit_id/compound', to: 'compounds#create'
     get ':exhibit_id/compound/:id/edit', to: 'compounds#edit', as: 'edit_compound'
     put ':exhibit_id/compound', to: 'compounds#update'
@@ -92,6 +92,9 @@ Spotlight::Engine.routes.draw do
     get ':exhibit_id/generate_pdfs/:id', to: 'catalog#one_pdf'
 
     post ':exhibit_id/save_screenshot/:id', to: 'catalog#save_screenshot'
+
+    get ':exhibit_id/set_all_thumbs', to: 'catalog#set_all_thumbs'
+
 end
 
   #custom ^^^^^^^^^^^^^
