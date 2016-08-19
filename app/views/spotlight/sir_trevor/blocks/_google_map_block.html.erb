@@ -2,8 +2,7 @@
 https://developers.google.com/maps/documentation/javascript/
 https://github.com/googlemaps/js-marker-clusterer
 -->
-
-<script src="https://maps.googleapis.com/maps/api/js?key="></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=<%=Rails.application.secrets[:gmaps_api_key]%>"></script>
 <script src="/assets/markerclusterer.js"></script>
 <div id="map" style="height: 80%"></div>
 
@@ -24,6 +23,7 @@ window.onload = function() {
   var overlap;
 
   //create the markers
+
   for (i = 0; i < items.length; i+=1) {
     lat = (/-?\d{1,3}\.\d+/).exec(items[i]["spotlight_upload_dc.Coverage-Spatial.Location_tesim"][0].split(",")[0]);
     lng = (/-?\d{1,3}\.\d+/).exec(items[i]["spotlight_upload_dc.Coverage-Spatial.Location_tesim"][0].split(",")[1]);
@@ -34,7 +34,7 @@ window.onload = function() {
       '<h4>'+items[i].full_title_tesim[0]+'</h4>'+
       '<div style=" display: table;">'+
         '<div style="display: table-row">'+
-          '<div style="display: table-cell;"><img src="'+ items[i].thumbnail_url_ssm +'" alt ="/uploads/spotlight/resources/videoupload/url/stockaudio.jpg" height="60" width = "60"/></div>'+
+          '<div style="display: table-cell;"><img src="'+ items[i].thumbnail_url_ssm +'" alt ="/uploads/spotlight/resources/videoupload/url/stockaudio.jpg" height="100" width = "100"/></div>'+
           '<div style="display: table-cell; vertical-align: top; padding-left: 10px;">'+ (items[i]["spotlight_upload_dc.description_tesim"] == null? "" : items[i]["spotlight_upload_dc.description_tesim"]) +'</div>'+
         '</div>'+
         '<div style="display: table-row">'+
@@ -43,6 +43,7 @@ window.onload = function() {
         '</div>'+
       '</div>';
 
+      //groupsize is the number that is displayed on the red pin when markers on the exact same spot
     marker = new google.maps.Marker({
       map: null,
       position: position,
