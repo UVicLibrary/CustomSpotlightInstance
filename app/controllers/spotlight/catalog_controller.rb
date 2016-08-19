@@ -85,7 +85,6 @@ module Spotlight
       id = params[:id].split('-')[1]
       decoded_no_header = Base64.decode64(result['data:image/png;base64,'.length .. -1])
       File.open('public/uploads/spotlight/resources/videoupload/url/'+ id +'/'+ id + '.png', 'wb') { |f| f.write(decoded_no_header) }
-
       solr = RSolr.connect :url => 'http://localhost:8983/solr/blacklight-core'
       solr.update(
         data: [{
@@ -99,7 +98,6 @@ module Spotlight
     end
 
     def set_all_thumbs
-      s = "hello!"
     end
 
 

@@ -2,7 +2,7 @@
 https://developers.google.com/maps/documentation/javascript/
 https://github.com/googlemaps/js-marker-clusterer
 -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRV_7eh-tewCt7CLuA7hkIhdz5BM08byM"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=<%=Rails.application.secrets[:gmaps_api_key]%>"></script>
 <script src="/assets/markerclusterer.js"></script>
 <div id="map" style="height: 80%"></div>
 
@@ -23,6 +23,7 @@ window.onload = function() {
   var overlap;
 
   //create the markers
+
   for (i = 0; i < items.length; i+=1) {
     lat = (/-?\d{1,3}\.\d+/).exec(items[i]["spotlight_upload_dc.Coverage-Spatial.Location_tesim"][0].split(",")[0]);
     lng = (/-?\d{1,3}\.\d+/).exec(items[i]["spotlight_upload_dc.Coverage-Spatial.Location_tesim"][0].split(",")[1]);
