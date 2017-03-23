@@ -74,8 +74,12 @@ var trackOutboundLink = function(url) {
   <body class="<%= render_body_class %>" data-no-turbolink="true">
   <%= render partial: 'shared/header_navbar' %>
   <%# if wwi and homepage do |something else| %>
-      <% if params[:controller] == "spotlight/home_pages" && params[:action] == "show" && params[:exhibit_id] == "wwi" %>
-        <%= render :partial => 'wwi/home' %>
+      <% if params[:controller] == "spotlight/home_pages" && params[:action] == "show" %>
+        <% if params[:exhibit_id] == "wwi" %>
+          <%= render :partial => 'wwi/home' %>
+        <%# elsif params[:exhibit_id] == "ian-mctaggart-cowan" %>
+          <%#= render :partial => 'imc/home' %>
+        <% end %>
       <% else %>
 	  	<%= render partial: 'shared/masthead' %>
 	  	<script type="text/javascript">

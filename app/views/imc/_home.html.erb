@@ -1,0 +1,183 @@
+<%
+	@buckets = []
+	@buckets.push({:Title => "Explore", :Subtitle => "Browse the Collection", :Description => "Photographs, Letters, Scrapbooks, &c.", :Image => "/uploads/spotlight/resources/upload/url/2459/small_1999-033.1.7.2_Map1_1.jpg", :Link => "/spotlight/wwi/feature/discover"})
+	@buckets.push({:Title => "Stories", :Subtitle => "Personal Histories", :Description => "Read the stories of Canada's citizens.", :Image => "/uploads/spotlight/resources/upload/url/3749/small_2000-030_ScrpBk_017_a.jpg", :Link => "/spotlight/wwi/feature/stories"})
+	@buckets.push({:Title => "Learn", :Subtitle => "Students & Teachers", :Description => "Use this exhibit in the class room.", :Image => "/uploads/spotlight/wwi/learn_FrontPage.jpg", :Link => "/spotlight/wwi/feature/learn"})
+
+	
+	  
+%>
+<%= javascript_include_tag "unslider-min" %>
+<%= stylesheet_link_tag    "unslider", media: "all" %>
+
+<style>
+#search-image {
+	height: 100%;
+	width: 700px;
+	background-image: url("/uploads/spotlight/resources/upload/url/1293/jpeg_Cloverpoint_front..jpg");
+	background-repeat: no-repeat;
+	background-size: 100%;
+	/*padding: 140px 10px 140px 110px;*/
+	padding-top: 342px;
+	margin: 0 auto; 
+} 
+.slider-image {
+	height: 100%;
+	width: 700px;
+	background-repeat: no-repeat;
+	background-size: 100%;
+	/*padding: 140px 10px 140px 110px;*/
+	padding-top: 342px;
+	margin: 0 auto; 
+	background-position: center;
+}
+#search-header {
+	height: 500px;
+	width: 725px;
+	float:left;
+}
+#buckets {
+	width: 300px;
+	float:left;
+    margin-left: 8px;
+}
+
+.custom-holder {
+	max-width: 1040px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.custom-card-front {
+	max-width: 100%; 
+	height: 155px;
+	background-size: 100%;
+	padding-top: 80px;
+}
+.front-card-title {
+	background-color: rgba(3,3,3,0.6);
+	padding-bottom: 15px;
+	padding-top: 15px;
+	color: white;
+	font-weight: bold;
+}
+.unslider-nav {
+	display: none;
+}
+/*<div id="search-image">
+			<%#= render_search_bar  %>
+			<a href="/spotlight/wwi/feature/welcome"><h1 class="front-card-title" style="margin-bottom:0;text-align: center;padding-top:8%">Enter Main Exhibit</h1></a>
+			<p class="front-card-title" style="font-weight: normal; margin-top:0; padding-top:0">&nbsp;</p>
+		</div>*/
+</style>
+<% 	slider_urls = ""
+	id_arr = [1346,3692,2453,3245]
+	id_arr.each do |id|
+		r = Spotlight::Resource.find(id)
+		slider_urls = slider_urls + "\"url(" +r.url.thumb.file.file.split("public").last + ")\","
+	end
+%>
+<%= render 'wwi/exhibit_navbar' if current_exhibit && !resource_masthead? %>
+<div class="custom-holder">
+	<div id="search-header">
+		<div class="my-slider">
+			<ul>
+				<% 	id_arr.each do |id|
+						r = Spotlight::Resource.find(id) %>
+					<%= ("<li class=\"slider-image\" style=\"background-image: url('"+r.url.thumb.file.file.split("public").last+"');\"></li>").html_safe %>
+				<% 	end %>
+			</ul>
+		</div>
+		<a href="/spotlight/wwi/feature/welcome" style="position:relative;top:-235px;"><h1 class="front-card-title" style="margin-bottom:0;text-align: center;padding-top:8%;">Enter Main Exhibit</h1></a>
+		<p class="front-card-title" style="font-weight: normal; margin-top:0; padding-top:0;position:relative;top:-235px;">&nbsp;</p>
+	</div>
+	<div id="buckets">
+	<%	@buckets.each do |bucket| %>
+		<%= link_to "", bucket[:Link], id: "bucket"+bucket[:Title] %>
+		<div onclick="document.getElementById('bucket<%=bucket[:Title]%>').click();" class="col-xs-12 exhibit-card" style="float:none; max-width:100%; height:155px; margin: 0 -16px 0 16px">
+		  <div class="flipper">
+			<div class="card-front card-face custom-card-front" style="background-image: url(<%=bucket[:Image]%>);">
+				<a href="<%=bucket[:Link]%>"><h2 class="front-card-title" style="text-align: center;"><%=bucket[:Title]%></h2></a>
+			</div>
+			<div class="card-back card-face" style="max-width:100%; height:155px;">
+				<h2 class="card-title"><%=bucket[:Title]%></h2>
+				<p class="subtitle"><%=bucket[:Subtitle]%></p>
+				<p class="description"><%=bucket[:Description]%></p>
+				<div class="visit-exhibit center-btn">
+				  <a class="btn btn-primary" role="button" href="<%=bucket[:Link]%>">Visit</a>
+				</div>
+			</div>
+		  </div>
+	    </div>
+	    <br>
+	<% 	end %>
+	</div>
+	
+	<div style="height: 200px;">
+	</div>
+</div>
+<script type="text/javascript">
+var search_image = $('#search-image');
+window.onload = function() {
+	$(window).bind('resize', function () { 
+		if ($(window).width()<=1050) {
+			$('#search-header').css("width", $(window).width().toString());
+			$('#search-header').css("height", ($(window).width()*0.588).toString());
+			search_image.css("width", ($(window).width()-50).toString());
+			search_image.css("padding-top", (parseInt($('#search-header').css("height"))-20).toString());
+			$('#buckets').css("width", ($(window).width()-32).toString());
+			$('#buckets').css("padding-top", "155");
+		}
+		else {
+			$('#search-header').css("width", "725");
+			$('#search-header').css("height", "500");
+			search_image.css("width", "700");
+			search_image.css("padding-top", "342");
+			$('#buckets').css("width", "300");
+			$('#buckets').css("padding-top", "0");
+		}
+	});
+	if ($(window).width()<=1050) {
+		$('#search-header').css("width", $(window).width().toString());
+		$('#search-header').css("height", ($(window).width()*0.588).toString());
+		search_image.css("width", ($(window).width()-50).toString());
+		search_image.css("padding-top", (parseInt($('#search-header').css("height"))-20).toString());
+		$('#buckets').css("width", ($(window).width()-32).toString());
+		$('#buckets').css("padding-top", "155");
+	}
+	else {
+		$('#search-header').css("width", "725");
+		$('#search-header').css("height", "500");
+		search_image.css("width", "700");
+		search_image.css("padding-top", "342");
+		$('#buckets').css("width", "300");
+		$('#buckets').css("padding-top", "0");
+	}
+	
+}
+</script>
+
+
+<script type="text/javascript">
+	jQuery(document).ready(function($) {
+			$('.my-slider').unslider({
+			autoplay: true,
+			arrows: true,
+			infinite: true
+			});
+			
+			$('.next')[0].innerHTML = '<span class="glyphicon glyphicon-chevron-right"></span>';
+			$('.prev')[0].innerHTML = '<span class="glyphicon glyphicon-chevron-left"></span>';
+		});
+/*var images = new Array(<%= slider_urls[0..-2].html_safe %>);
+current = 0;
+
+function carousel() {
+	current++;
+    current = current % images.length;
+    search_image.css('background-image', images[current]);
+    setTimeout(carousel, 8000);
+}
+carousel();*/
+document.getElementsByName('utf8')[0].remove();
+</script>

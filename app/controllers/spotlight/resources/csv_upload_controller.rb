@@ -29,7 +29,9 @@ module Spotlight
 
       def build_resource
          if (params[:resources_upload][:url].content_type.include? "audio") ||
-				  (params[:resources_upload][:url].content_type.include? "video")
+				  (params[:resources_upload][:url].content_type.include? "video") ||
+				  (params[:resources_upload][:url].content_type.include? "zip") ||
+				  (params[:resources_upload][:url].content_type.include? "pdf")
 				  Rails.logger.info("\n AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"\n****************************\n video or audio upload\n\nPARAMS: #{params.inspect}")
 			  @resource ||= Spotlight::Resources::Videoupload.new exhibit: current_exhibit
 		  else

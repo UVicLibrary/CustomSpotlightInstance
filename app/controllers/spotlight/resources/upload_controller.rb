@@ -42,7 +42,8 @@ module Spotlight
 		  Rails.logger.info("\n AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"\n****************************\nIn upload_controller \n\nPARAMS: #{params.inspect}")
       if (params[:resources_upload][:url].content_type.include? "audio") ||
 		 (params[:resources_upload][:url].content_type.include? "video") ||
-         (params[:resources_upload][:url].content_type.include? "zip")
+         (params[:resources_upload][:url].content_type.include? "zip") ||
+         (params[:resources_upload][:url].content_type.include? "pdf")
 			  @resource ||= Spotlight::Resources::Videoupload.new exhibit: current_exhibit
 		  else
 			  @resource ||= Spotlight::Resources::Upload.new exhibit: current_exhibit

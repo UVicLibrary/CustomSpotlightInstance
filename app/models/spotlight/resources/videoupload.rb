@@ -1,10 +1,8 @@
 # encoding: utf-8
 require 'net/http/post/multipart'
-
 module Spotlight
   module Resources
     API_KEY = Rails.application.secrets[:sketchfab_api_key]
-    ##
     # Exhibit-specific resources, created using uploaded and custom fields
     class Videoupload < Spotlight::Resource
 	  Rails.logger.warn("In object videoupload.rb line 7 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
@@ -30,6 +28,22 @@ module Spotlight
 
       def configured_fields
         self.class.fields(exhibit)
+      end
+
+      def to_solr
+        store_url! # so that #url doesn't return the tmp directory
+        solr_hash = super
+          Rails.logger.warn("In object videoupload.rb line 35 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
+        add_default_solr_fields solr_hash
+          if File.exist? "/home/exhibit/ww1-project/ww1-project/public/uploads/spotlight/resources/videoupload/url/#{id}/#{id}.png"
+		    solr_hash["thumbnail_url_ssm"] = "/uploads/spotlight/resources/videoupload/url/#{id}/#{id}.png"
+		  end
+          Rails.logger.warn("In object videoupload.rb line 39 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
+        add_file_versions solr_hash
+          Rails.logger.warn("In object videoupload.rb line 41 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
+        add_sidecar_fields solr_hash
+          Rails.logger.warn("In object videoupload.rb line 43 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
+        solr_hash
       end
 
       #upload 3d model to sketchfab via https POST
@@ -61,25 +75,10 @@ module Spotlight
             when Net::HTTPRedirection then
               Rails.logger.warn "HTTPS redirected!"
             else
-							flash[:error] = res.body
+							#flash[:error] = res.body
               Rails.logger.warn res.body
           end
         end
-      end
-
-      def to_solr
-        store_url! # so that #url doesn't return the tmp directory
-        solr_hash = super
-          Rails.logger.warn("In object videoupload.rb line 35 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
-        add_default_solr_fields solr_hash
-          Rails.logger.warn("In object videoupload.rb line 37 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
-        #add_image_dimensions solr_hash
-          Rails.logger.warn("In object videoupload.rb line 39 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
-        add_file_versions solr_hash
-          Rails.logger.warn("In object videoupload.rb line 41 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
-        add_sidecar_fields solr_hash
-          Rails.logger.warn("In object videoupload.rb line 43 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
-        solr_hash
       end
 
       private
@@ -89,16 +88,10 @@ module Spotlight
 		    solr_hash[Spotlight::Engine.config.full_image_field] = "#{url}"
 		      if "#{url}".end_with? "mp4"
 			      solr_hash["thumbnail_url_ssm"] = "/uploads/spotlight/resources/videoupload/url/stock.jpg"
-		      else
+			  else
 			      solr_hash["thumbnail_url_ssm"] = "/uploads/spotlight/resources/videoupload/url/stockaudio.jpg"
 		      end
 	    end
-
-      def add_image_dimensions(solr_hash)
-        dimensions = ::MiniMagick::Image.open(url.file.file)[:dimensions]
-        solr_hash[:spotlight_full_image_width_ssm] = nil
-        solr_hash[:spotlight_full_image_height_ssm] = nil
-      end
 
       def add_file_versions(solr_hash)
 Rails.logger.warn("In object videoupload.rb add_file_versions line 56 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")

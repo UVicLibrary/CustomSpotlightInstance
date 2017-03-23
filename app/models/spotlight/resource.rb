@@ -61,7 +61,7 @@ module Spotlight
       end
 
       protected
-
+ 
       ##
       # @return an enumerator of all the indexable documents for this resource
       def documents_to_index

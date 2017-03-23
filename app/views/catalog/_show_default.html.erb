@@ -14,22 +14,29 @@ dt {
 </style>
 <br>
  <% page_number = 0
+field_value = nil
   @docs.each do |page| %>
 	  <div class="page" id="page_<%= page_number %>" style="display: none;">
 	    <% if @exhibit.users.include? current_or_guest_user %>
 	    	<%= exhibit_edit_link page, [:edit, current_exhibit, page], class: 'pull-right btn btn-primary' if can?(:curate, current_exhibit) and !current_page? [:edit, current_exhibit, page]  %>
 	    <% end %>
 	  	<dt onclick="hideShow('full_title_tesim', <%= page_number %>);" class="blacklight-full_title_tesim %>"><a><span id="full_title_tesim-page_<%= page_number %>" class="glyphicon glyphicon-chevron-down"></span>Page Title:</a></dt>
-		<dd class="blacklight-full_title_tesim"><%= page._source["full_title_tesim"].to_s.delete("[\"]") %></dd>
+	  	<dd class="blacklight-full_title_tesim"><%= page._source["full_title_tesim"].to_s.delete("[\"]") %></dd>
 		  <% document_show_fields(page).each do |field_name, field| -%>
 			<% if should_render_show_field? page, field %>
 				<dt onclick="hideShow('<%= field_name.parameterize %>', <%= page_number %>);" class="blacklight-<%= field_name.parameterize %>"><a><span id="<%= field_name.parameterize %>-page_<%= page_number %>" class="glyphicon glyphicon-chevron-down"></span><%= render_document_show_field_label page, field: field_name %></a></dt>
-				<dd class="blacklight-<%= field_name.parameterize %>"><%= render_document_show_field_value page, field: field_name %></dd>
+				<% field_value = render_document_show_field_value( page, field: field_name) %>
+				<dd class="blacklight-<%= field_name.parameterize %>"><% if (field_name=="spotlight_upload_dc.description_tesim") && (@exhibit.id == 4) %>
+				<%= (render_document_show_field_value page, field: field_name).gsub("&lt;", "<").gsub("&gt;", ">").html_safe %>
+				<% else %>
+				<%= render_document_show_field_value page, field: field_name %>
+				<% end %>
+				</dd>
 				<!-- show field_name <%= field_name %>-->
 			<% else %>
 			<!-- dont show field_name <%= field_name %> -->
 			<% end -%>
-		  <% end -%>
+		<% end -%>
 		  <br>
 		  <br>
 		<font color="blue" style="font-weight:bold;">
@@ -40,7 +47,7 @@ dt {
 		<% end %>
 		</font>
 	  </div>
-  <%page_number += 1 
+  <%page_number += 1
   	end %>
 <% if @docs.length > 1 %>
   	<script type="text/javascript">
@@ -52,7 +59,11 @@ dt {
   <% document_show_fields(document).each do |field_name, field| -%>
     <% if should_render_show_field? document, field %>
 	    <dt onclick="hideShow('<%= field_name.parameterize %>', <%= @docs.length %>);" class="blacklight-<%= field_name.parameterize %>"><a><span id="<%= field_name.parameterize %>-page_<%= page_number %>" class="glyphicon glyphicon-chevron-down"></span><%= render_document_show_field_label document, field: field_name %></a></dt>
-	    <dd class="blacklight-<%= field_name.parameterize %>"><%= render_document_show_field_value document, field: field_name %></dd>
+	    <dd class="blacklight-<%= field_name.parameterize %>"><% if (field_name=="spotlight_upload_dc.description_tesim") && (@exhibit.id == 4) %>
+				<%= (render_document_show_field_value document, field: field_name).gsub("&lt;", "<").gsub("&gt;", ">").html_safe %>
+				<% else %>
+				<%= render_document_show_field_value document, field: field_name %>
+				<% end %></dd>
 		<!-- show field_name <%= field_name %> -->
 	<% else %>
 	<!-- dont show field_name <%= field_name %> -->

@@ -22,3 +22,6 @@ client_id.json
 *.p12
 /jetty/*
 /config/*.yml
+
+#ignore public 
+/public

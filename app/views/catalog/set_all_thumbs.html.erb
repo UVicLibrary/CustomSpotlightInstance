@@ -17,13 +17,13 @@
         clearInterval(timer);
       }else{
         document.getElementById('frame').src = '/spotlight/'+models[i].id.split("-")[0]+'/catalog/'+models[i++].id +'#screenshot';
-        document.getElementById('frame').onload = function(){
+        //document.getElementById('frame').contentDocument.getElementById('api-frame').onload = function(){
           setTimeout(function(){
             $('#frame').contents().find('#screenshot').trigger( "click" );
-          },5000);
-        }
+          },10000);
+        //} 
       }
-    },10000)
+    },15000)
   });
   </script>
 </body>

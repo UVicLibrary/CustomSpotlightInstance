@@ -8,9 +8,9 @@ module Spotlight
     load_and_authorize_resource
 
     def index
-      #byebug
     	@published_exhibits = @exhibits.published.page(params[:page])
       @published_exhibits = @published_exhibits.tagged_with(params[:tag]) if params[:tag]
+      #@published_exhibits.delete_all("id = 7")
       
       if @exhibits.one?
         redirect_to @exhibits.first

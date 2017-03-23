@@ -34,6 +34,7 @@ Rails.logger.warn("In object upload.rb line 33 AT:"+Time.now.strftime("%m%d %H:%
         add_image_dimensions solr_hash
 Rails.logger.warn("In object upload.rb line 35 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
         add_file_versions solr_hash
+        #keep_existing_version_urls solr_hash if skip
 Rails.logger.warn("In object upload.rb line 37 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
         add_sidecar_fields solr_hash
 Rails.logger.warn("In object upload.rb line 39 AT:"+Time.now.strftime("%m%d %H:%M:%S:%L")+"")
@@ -41,6 +42,12 @@ Rails.logger.warn("In object upload.rb line 39 AT:"+Time.now.strftime("%m%d %H:%
       end
 
       private
+
+      def keep_existing_version_urls(solr_hash)
+        solr_hash[Spotlight::Engine.config.try(:thumbnail_field)] = url.thumb.url
+        solr_hash[Spotlight::Engine.config.try(:square_image_field)] = url.square.url
+        solr_hash[Spotlight::Engine.config.try(:full_image_field)] = url.url
+      end
 
       def add_default_solr_fields(solr_hash)
         solr_hash[exhibit.blacklight_config.document_model.unique_key.to_sym] = compound_id

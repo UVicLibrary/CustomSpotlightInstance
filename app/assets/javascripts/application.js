@@ -15,5 +15,5 @@
 //= require turbolinks//
 // Required by Blacklight
 //= require blacklight/blacklight
-
+//= require sir-trevor
 //= require_tree .

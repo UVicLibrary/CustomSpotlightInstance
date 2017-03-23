@@ -31,7 +31,8 @@ class CatalogController < ApplicationController
 
     config.add_sort_field 'relevance', sort: 'score desc', label: 'Relevance'
     config.add_sort_field 'timestamp', sort: 'timestamp desc', label: 'Date Modified'
-
+    
+    
     config.add_field_configuration_to_solr_request!
     
     config.add_facet_field 'spotlight_upload_dc.Subjects_ftesim', :label => 'Subject', :limit => 10
